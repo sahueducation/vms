@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>Dashboard</title>
+    <meta content="" name="description" />
+    <meta content="" name="keywords" />
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon" />
+
+    <!-- Vendor CSS Files -->
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <main class="main" id="mainContain" style="margin: 10px">
+      <div class="pagetitle">
+        <h1 style="display: inline-block">Manage Master Data</h1>
+        <button type="button" id="btnCancel" class="btn" style="float: right">
+          <i class="bi bi-x-square"></i>
+        </button>
+      </div>
+      <!-- End Page Title -->
+
+      <section class="section">
+        <div class="row">
+          <div class="col-lg-7">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">
+                  Manage States / Departments / Category
+                </h5>
+
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link active"
+                      id="states-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#statesTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="home"
+                      aria-selected="true"
+                    >
+                      States
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="departments-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#departmentsTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="profile"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      Departments
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="visitorCategory-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#visitorCategoryTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="contact"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      Category
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="designation-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#designationTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="contact"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      Designation
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="idproof-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#idproofTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="contact"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      ID Proof
+                    </button>
+                  </li>
+                </ul>
+                <div
+                  class="tab-content pt-2"
+                  id="myTabContent"
+                  style="
+                    border-left: 1px solid #dee2e6;
+                    border-right: 1px solid #dee2e6;
+                    border-bottom: 1px solid #dee2e6;
+                    padding: 5px;
+                    border-radius: 0 0 5px 5px;
+                  "
+                >
+                  <div
+                    class="tab-pane fade show active"
+                    id="statesTab"
+                    role="tabpanel"
+                    aria-labelledby="states-tab"
+                  >
+                    <form
+                      class="row g-3"
+                      onsubmit="return formSubmit(this)"
+                      method="POST"
+                    >
+                      <div class="col-md-10">
+                        <label for="states" class="form-label"
+                          >Add New State</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="States"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label" style="color: white"
+                          >.........</label
+                        >
+                        <button type="submit" class="btn btn-primary">
+                          Add
+                        </button>
+                      </div>
+                      <div class="col-md-12">
+                        <label for="statesList" class="form-label"
+                          >Stat's Name</label
+                        >
+                        <select
+                          class="form-select"
+                          multiple
+                          id="StatesList"
+                          onchange="enableEditBtn(this);"
+                          style="height: 150px"
+                        ></select>
+                      </div>
+
+                      <div class="text-center">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          id="btnEditStates"
+                          data-bs-toggle="modal"
+                          data-bs-target="#smallModal"
+                          disabled
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          id="btnDeleteStates"
+                          onclick="deleteRecord(this)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </form>
+                    <div
+                      class="modal fade"
+                      id="smallModal"
+                      tabindex="-1"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Update State Name</h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="col-md-12">
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="editStates"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              id="btnCloseStates"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-primary"
+                              id="btnUpdateStates"
+                              onclick="updateRecord(this);"
+                            >
+                              Save Changes
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="tab-pane fade"
+                    id="departmentsTab"
+                    role="tabpanel"
+                    aria-labelledby="departments-tab"
+                  >
+                    <!-- Multi Columns Form -->
+                    <form
+                      class="row g-3"
+                      onsubmit="return formSubmit(this)"
+                      method="POST"
+                    >
+                      <div class="col-md-10">
+                        <label for="Departments" class="form-label"
+                          >Add New Department/Section</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="Departments"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label" style="color: white"
+                          >.........</label
+                        >
+                        <button type="submit" class="btn btn-primary">
+                          Add
+                        </button>
+                      </div>
+                      <div class="col-md-12">
+                        <label for="depts" class="form-label"
+                          >Department's Name</label
+                        >
+                        <select
+                          class="form-select"
+                          multiple
+                          id="DepartmentsList"
+                          onchange="enableEditBtn(this)"
+                          style="height: 150px"
+                        ></select>
+                      </div>
+
+                      <div class="text-center">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          id="btnEditDepartments"
+                          data-bs-toggle="modal"
+                          data-bs-target="#depModal"
+                          disabled
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          id="btnDeleteDepartments"
+                          onclick="deleteRecord(this)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </form>
+                    <!-- End Multi Columns Form -->
+                    <div
+                      class="modal fade"
+                      id="depModal"
+                      tabindex="-1"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Update Department Name</h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="col-md-12">
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="editDepartments"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              id="btnCloseDepartments"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-primary"
+                              id="btnUpdateDepartments"
+                              onclick="updateRecord(this);"
+                            >
+                              Save Changes
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Visitor Category Start -->
+                  <div
+                    class="tab-pane fade"
+                    id="visitorCategoryTab"
+                    role="tabpanel"
+                    aria-labelledby="visitorCategory-tab"
+                  >
+                    <!-- Multi Columns Form -->
+                    <form
+                      class="row g-3"
+                      onsubmit="return formSubmit(this)"
+                      method="POST"
+                    >
+                      <div class="col-md-10">
+                        <label for="VisitorCategory" class="form-label"
+                          >Add New Category</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="VisitorCategory"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label" style="color: white"
+                          >.........</label
+                        >
+                        <button type="submit" class="btn btn-primary">
+                          Add
+                        </button>
+                      </div>
+                      <div class="col-md-12">
+                        <label for="VisitorCategoryList" class="form-label"
+                          >All Categories
+                        </label>
+                        <select
+                          class="form-select"
+                          multiple
+                          id="VisitorCategoryList"
+                          onchange="enableEditBtn(this)"
+                          style="height: 150px"
+                        ></select>
+                      </div>
+
+                      <div class="text-center">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          id="btnEditVisitorCategory"
+                          data-bs-toggle="modal"
+                          data-bs-target="#visitorCatModal"
+                          disabled
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          id="btnDeleteVisitorCategory"
+                          onclick="deleteRecord(this)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </form>
+                    <!-- End Multi Columns Form -->
+                    <div
+                      class="modal fade"
+                      id="visitorCatModal"
+                      tabindex="-1"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Update Category Name</h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="col-md-12">
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="editVisitorCategory"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              id="btnCloseVisitorCategory"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-primary"
+                              id="btnUpdateVisitorCategory"
+                              onclick="updateRecord(this);"
+                            >
+                              Save Changes
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Designation Tap Start -->
+                  <div
+                    class="tab-pane fade"
+                    id="designationTab"
+                    role="tabpanel"
+                    aria-labelledby="designation-tab"
+                  >
+                    <!-- Multi Columns Form -->
+                    <form
+                      class="row g-3"
+                      onsubmit="return formSubmit(this)"
+                      method="POST"
+                    >
+                      <div class="col-md-10">
+                        <label for="Designation" class="form-label"
+                          >Add New Designation</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="Designation"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label" style="color: white"
+                          >.........</label
+                        >
+                        <button type="submit" class="btn btn-primary">
+                          Add
+                        </button>
+                      </div>
+                      <div class="col-md-12">
+                        <label for="DesignationList" class="form-label"
+                          >All Designation
+                        </label>
+                        <select
+                          class="form-select"
+                          multiple
+                          id="DesignationList"
+                          onchange="enableEditBtn(this)"
+                          style="height: 150px"
+                        ></select>
+                      </div>
+
+                      <div class="text-center">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          id="btnEditDesignation"
+                          data-bs-toggle="modal"
+                          data-bs-target="#DesignationModal"
+                          disabled
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          id="btnDeleteDesignation"
+                          onclick="deleteRecord(this)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </form>
+                    <!-- End Multi Columns Form -->
+                    <div
+                      class="modal fade"
+                      id="DesignationModal"
+                      tabindex="-1"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Update Designation Name</h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="col-md-12">
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="editDesignation"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              id="btnCloseDesignation"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-primary"
+                              id="btnUpdateDesignation"
+                              onclick="updateRecord(this);"
+                            >
+                              Save Changes
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Designation Tap End -->
+
+                  <!-- Designation IDProof Start -->
+                  <div
+                    class="tab-pane fade"
+                    id="idproofTab"
+                    role="tabpanel"
+                    aria-labelledby="idproof-tab"
+                  >
+                    <!-- Multi Columns Form -->
+                    <form
+                      class="row g-3"
+                      onsubmit="return formSubmit(this)"
+                      method="POST"
+                    >
+                      <div class="col-md-10">
+                        <label for="IDProof" class="form-label"
+                          >Add New ID Proof</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="IDProof"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label" style="color: white"
+                          >.........</label
+                        >
+                        <button type="submit" class="btn btn-primary">
+                          Add
+                        </button>
+                      </div>
+                      <div class="col-md-12">
+                        <label for="IDProofList" class="form-label"
+                          >All ID Proofs
+                        </label>
+                        <select
+                          class="form-select"
+                          multiple
+                          id="IDProofList"
+                          onchange="enableEditBtn(this)"
+                          style="height: 150px"
+                        ></select>
+                      </div>
+
+                      <div class="text-center">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          id="btnEditIDProof"
+                          data-bs-toggle="modal"
+                          data-bs-target="#IDProofModal"
+                          disabled
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          id="btnDeleteIDProof"
+                          onclick="deleteRecord(this)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </form>
+                    <!-- End Multi Columns Form -->
+                    <div
+                      class="modal fade"
+                      id="IDProofModal"
+                      tabindex="-1"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Update ID Proof</h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="col-md-12">
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="editIDProof"
+                                required
+                              />
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              id="btnCloseIDProof"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-primary"
+                              id="btnUpdateIDProof"
+                              onclick="updateRecord(this);"
+                            >
+                              Save Changes
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Designation IDProof End -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Manage Header / Footer / Logo</h5>
+                <ul class="nav nav-tabs" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link active"
+                      id="header-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#headerTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="header"
+                      aria-selected="true"
+                    >
+                      Header
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="footer-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#footerTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="footer"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      Footer
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="logo-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#logoTab"
+                      type="button"
+                      role="tab"
+                      aria-controls="logo"
+                      aria-selected="false"
+                      tabindex="-1"
+                    >
+                      Logo
+                    </button>
+                  </li>
+                </ul>
+                <div
+                  class="tab-content pt-2"
+                  style="
+                    border-left: 1px solid #dee2e6;
+                    border-right: 1px solid #dee2e6;
+                    border-bottom: 1px solid #dee2e6;
+                    padding: 5px;
+                    border-radius: 0 0 5px 5px;
+                  "
+                >
+                  <div
+                    class="tab-pane fade show active"
+                    id="headerTab"
+                    role="tabpanel"
+                    aria-labelledby="header-tab"
+                  >
+                    <form
+                      class="row g-3"
+                      onsubmit="return submitContents();"
+                      method="POST"
+                      style="margin: 0; padding: 0"
+                    >
+                      <!-- Quill Editor Default -->
+                      <div id="headerContent"></div>
+                      <!-- End Quill Editor Default -->
+
+                      <div class="text-center">
+                        <button
+                          type="submit"
+                          class="btn btn-secondary"
+                          id="btnUpdateHeaderCont"
+                        >
+                          Update
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <div
+                    class="tab-pane fade"
+                    id="footerTab"
+                    role="tabpanel"
+                    aria-labelledby="footer-tab"
+                  >
+                    <form
+                      class="row g-3"
+                      onsubmit="return submitContents();"
+                      method="POST"
+                      style="margin: 0; padding: 0"
+                    >
+                      <!-- Quill Editor Default -->
+                      <div id="footerContent"></div>
+                      <!-- End Quill Editor Default -->
+
+                      <div class="text-center">
+                        <button
+                          type="submit"
+                          class="btn btn-secondary"
+                          id="btnUpdateFooter"
+                        >
+                          Update
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <div
+                    class="tab-pane fade"
+                    id="logoTab"
+                    role="tabpanel"
+                    aria-labelledby="logo-tab"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.js"></script>
+    <script src="./idb.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="./master-renderer.js"></script>
+  </body>
+</html>

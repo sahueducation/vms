@@ -1,0 +1,14 @@
+{
+    "name": "visitors-proj",
+    "version": "1.0.0",
+    "description": "Visitors Management System",
+    "main": "main.js",
+    "author": "Akshaya",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^28.2.2"
+    },
+    "scripts": {
+        "start": "electron ."
+      }
+}

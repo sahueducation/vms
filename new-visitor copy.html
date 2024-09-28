@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>Dashboard</title>
+    <meta content="" name="description" />
+    <meta content="" name="keywords" />
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon" />
+
+    <!-- Vendor CSS Files -->
+    <link
+      href="assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet" />
+  </head>
+  <style>
+    .uppercase {
+      text-transform: uppercase;
+    }
+
+    @page {
+      size: landscape;
+      margin: 10%;
+    }
+
+    @media print {
+      #printButton {
+        display: none;
+      }
+
+      button {
+        display: none;
+      }
+    }
+  </style>
+  <body>
+    <main class="main" id="mainContain" style="margin: 10px">
+      <div class="pagetitle">
+        <h1 style="display: inline-block">Visitor's Details</h1>
+        <button type="button" id="btnCancel" class="btn" style="float: right">
+          <i class="bi bi-x-square"></i>
+        </button>
+      </div>
+      <!-- End Page Title -->
+      <section class="section">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Vitor's Information</h5>
+
+                <!-- Multi Columns Form -->
+                <form
+                  class="row g-2"
+                  onsubmit="return formSubmit();"
+                  method="POST"
+                >
+                  <div class="col-md-4">
+                    <label for="contactnumber" class="form-label"
+                      >Contact Number</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="contactnumber"
+                      maxlength="10"
+                      minlength="10"
+                      required
+                      onblur="getVisitorDetails(this);"
+                    />
+                    <input type="hidden" id="visitorId" value="" />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="id-proof" class="form-label">ID Proof</label>
+                    <select id="id-proof" class="form-select" required>
+                      <option>Aadhar Card</option>
+                      <option>Voter Card</option>
+                      <option>PAN Card</option>
+                      <option>Driving License</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label for="id-number" class="form-label">ID Number</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="id-number"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-5">
+                    <label for="name" class="form-label">Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="name"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <label for="age" class="form-label">Age</label>
+                    <input type="text" class="form-control" id="age" />
+                  </div>
+                  <div class="col-md-5">
+                    <label for="fname" class="form-label">Father's Name</label>
+                    <input type="text" class="form-control" id="fname" />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="organization" class="form-label"
+                      >Organization Name</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="organization"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="address" class="form-label">Address</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="address"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="city" class="form-label">City</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="city"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="district" class="form-label">District</label>
+                    <input type="text" class="form-control" id="district" />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="state" class="form-label">State</label>
+                    <select id="state" class="form-select" required>
+                      <option></option>
+                    </select>
+                  </div>
+                  <div class="text-center">
+                    <button type="submit" class="btn btn-primary" id="btnAdd">
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn btn-danger"
+                      id="btnCancel"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+                <!-- End Multi Columns Form -->
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Visitor's Photo</h5>
+                <div class="card-img-top">
+                  <video
+                    id="video"
+                    style="border: 2px solid black; width: 304px; height: 229px"
+                  >
+                    Video stream not available.
+                  </video>
+                  <img
+                    id="photo"
+                    alt="The screen capture will appear in this box."
+                    style="
+                      border: 2px solid black;
+                      width: 304px;
+                      height: 229px;
+                      display: none;
+                    "
+                  />
+                </div>
+                <div>
+                  <button id="startbutton" class="btn btn-secondary">
+                    Capture Photo
+                  </button>
+                </div>
+                <canvas
+                  data-is-captured="n"
+                  id="canvas"
+                  style="display: none"
+                ></canvas>
+                <div style="display: block; width: 10px; height: 10px"></div>
+                <div
+                  id="alertCapture"
+                  style="visibility: hidden"
+                  class="alert alert-danger alert-dismissible fade show"
+                  role="alert"
+                >
+                  <i class="bi bi-exclamation-octagon me-1"></i>
+                  Please capture photo before submitting.
+                  <button
+                    id="btnAlertClose"
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Visiting Details</h5>
+                <form
+                  class="row g-2"
+                  onsubmit="return formSubmit();"
+                  method="POST"
+                >
+                  <div class="col-md-6">
+                    <label for="tomeet" class="form-label">To Meet</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="tomeet"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="departments" class="form-label"
+                      >Departments/Section</label
+                    >
+                    <select id="departments" class="form-select" required>
+                      <option></option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="purpose" class="form-label"
+                      >Purpose of Visit</label
+                    >
+                    <input type="text" class="form-control" id="purpose" />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="numperson" class="form-label"
+                      >Number of Person</label
+                    >
+                    <input type="number" class="form-control" id="numperson" />
+                  </div>
+                  <div class="text-center">
+                    <button type="submit" class="btn btn-primary" id="btnAdd">
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn btn-danger"
+                      id="btnCancel"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <section id="printArea" class="section" style="margin: 20px; display: none">
+      <div class="row"><b id="headerText"></b></div>
+
+      <div class="row">
+        <table style="border-bottom: 1px dotted">
+          <tr>
+            <td>Visitor Slip No</td>
+            <td>: <span id="slipNo">12345</span></td>
+            <td>Category: GENERAL PUBLIC</td>
+            <td rowspan="2">
+              <img id="imgVisitor" src="assets/img/default.png" height="150" />
+            </td>
+          </tr>
+          <tr>
+            <td>Date</td>
+            <td>: <span id="visitingDate">01-02-2024</span></td>
+            <td>Time : <span id="visitingTime">03:09 PM</span></td>
+          </tr>
+        </table>
+        <table style="border-bottom: 1px dotted">
+          <tr>
+            <td>Name</td>
+            <td>: <span class="uppercase" id="visitorName"></span></td>
+            <td>Age : <span class="uppercase" id="visitorAge"></span></td>
+            <td>Contact Number : <span id="visitorPhone"></span></td>
+          </tr>
+          <tr>
+            <td>Father's Name</td>
+            <td>: <span id="visitorFname" class="uppercase"></span></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Address</td>
+            <td>
+              : <span id="visitorAddress" class="uppercase"></span><br /><span
+                class="uppercase"
+                id="visitorCity"
+              ></span>
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>State</td>
+            <td>: <span id="visitorState" class="uppercase"></span></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>District</td>
+            <td>: <span id="visitorDistrict" class="uppercase"></span></td>
+            <td>Full Signature of pass holder</td>
+            <td></td>
+          </tr>
+        </table>
+
+        <table style="border-bottom: 1px dotted">
+          <tr>
+            <td>To Meet</td>
+            <td>: <span id="visitorToMeet" class="uppercase"></span></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Department/Section</td>
+            <td>: <span id="visitorToMeetSec" class="uppercase"></span></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Purpose Of Visite</td>
+            <td>: <span id="visitorPurpose" class="uppercase"></span></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>No. Of Person</td>
+            <td>: <span id="visitorNoPerson" class="uppercase"></span></td>
+            <td>Signature of visited Officer/Official</td>
+            <td>&nbsp;</td>
+          </tr>
+        </table>
+        <table>
+          <tr>
+            <td>
+              Instruction :-- <br />
+              1. Carry this pass with you at tll times while you are in PHQ
+              Building.<br />
+              2. Show this pass whenever required by the staff.<br />
+              3. Visitor Slip is valid for one hour only from the time of
+              Issue.<br />
+              4. Return this pass at security gate/ Visitor Window before
+              leaving the premises.<br />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="text-center" id="printButton">
+        <button
+          type="button"
+          class="btn btn btn-danger"
+          id="btnPrint"
+          onclick="printPage()"
+        >
+          Print
+        </button>
+        <button
+          type="button"
+          class="btn btn btn-danger"
+          id="btnBack"
+          onclick="back()"
+        >
+          Cancel
+        </button>
+      </div>
+    </section>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="./idb.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="./new-visitor-renderer.js"></script>
+  </body>
+</html>
