@@ -36,11 +36,6 @@ document.getElementById("manageDB").addEventListener("click", (e) => {
   window.electronAPI.setConf("managedb");
 });
 
-document.getElementById("reports").addEventListener("click", (e) => {
-  e.preventDefault();
-  window.electronAPI.setReports("y");
-});
-
 document.getElementById("departmentReports").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.setReports("dep");
