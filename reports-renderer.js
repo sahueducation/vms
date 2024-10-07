@@ -102,6 +102,11 @@ function initPopulateList(d) {
   }
 }
 
+/*********** Export to CSV ********* */
+function exportToCSV() {
+  console.log("Export to CSV testing...");
+}
+
 function prepareInt(d) {
   dbName = d.database.dbName;
   version = d.database.version;
