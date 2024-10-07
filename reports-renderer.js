@@ -104,7 +104,14 @@ function initPopulateList(d) {
 
 /*********** Export to CSV ********* */
 function exportToCSV() {
-  console.log("Export to CSV testing...");
+  let tableData = document.getElementById("reportTable").outerHTML;
+  tableData = tableData.replace(/<A[^>]*>|<\/A>/g, ""); //remove if u want links in your table
+  tableData = tableData.replace(/<input[^>]*>|<\/input>/gi, ""); //remove input params
+
+  let a = document.createElement("a");
+  a.href = `data:application/vnd.ms-excel, ${encodeURIComponent(tableData)}`;
+  a.download = "report.xls";
+  a.click();
 }
 
 function prepareInt(d) {
