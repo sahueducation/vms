@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Dashboard</title>
+    <title>Reports</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
@@ -28,10 +28,25 @@
     <link href="assets/css/style.css" rel="stylesheet" />
   </head>
 
+  <style>
+    @page {
+      margin: 1%;
+    }
+
+    @media print {
+      #ExtralargeModal {
+        display: block !important;
+      }
+
+      #mainContain {
+        display: none !important;
+      }
+    }
+  </style>
   <body>
     <main class="main" id="mainContain" style="margin: 10px">
       <div class="pagetitle">
-        <h1 style="display: inline-block">Reports</h1>
+        <h1 style="display: inline-block">Reports : Departmentwise</h1>
         <input type="hidden" value="" id="report-type" />
         <button type="button" id="btnClose" class="btn" style="float: right">
           <i class="bi bi-x-square"></i>
@@ -43,7 +58,47 @@
           <div class="col-lg-12">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">Datatables</h5>
+                <div class="row">
+                  <div
+                    class="col-lg-12 d-flex justify-content-end"
+                    style="padding-top: 10px"
+                  >
+                    <div class="input-group mb-3">
+                      <select
+                        class="form-select"
+                        aria-label="Default select example"
+                        id="departmentList"
+                      >
+                        <option selected="">Select Department</option>
+                      </select>
+                    </div>
+                    <div class="input-group mb-3" style="margin-left: 5px">
+                      <span class="input-group-text" id="basic-fromdate"
+                        >From Date</span
+                      >
+                      <input
+                        type="date"
+                        class="form-control"
+                        aria-describedby="basic-fromdate"
+                      />
+                    </div>
+                    <div class="input-group mb-3" style="margin-left: 5px">
+                      <span class="input-group-text" id="basic-todate"
+                        >To Date</span
+                      >
+                      <input
+                        type="date"
+                        class="form-control"
+                        aria-describedby="basic-todate"
+                      />
+                    </div>
+                    <div class="input-group mb-3" style="margin-left: 5px">
+                      <button id="go" class="btn btn-primary" onclick="">
+                        Go
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
                 <!-- Table with stripped rows -->
                 <table
@@ -55,9 +110,7 @@
                       <th scope="col">Name</th>
                       <th scope="col">Contact Number</th>
                       <th scope="col">City</th>
-                      <th scope="col" data-type="date" data-format="DD/MM/YYYY">
-                        Visiting Date
-                      </th>
+                      <th scope="col" data-type="date">Visiting Date</th>
                       <th scope="col">Department</th>
                     </tr>
                   </thead>
@@ -95,7 +148,7 @@
                     </nav>
                     <!-- Pagination End -->
                   </div>
-                  <div class="col-lg-6">
+                  <div class="col-lg-6" style="text-align: right">
                     <button
                       id="export-csv"
                       class="btn btn-primary"
@@ -103,7 +156,11 @@
                     >
                       Export Excel
                     </button>
-                    <button id="export-sql" class="btn btn-primary">
+                    <button
+                      id="export-sql"
+                      class="btn btn-primary"
+                      onclick="exportToPDF()"
+                    >
                       Export PDF
                     </button>
                   </div>
@@ -114,13 +171,24 @@
         </div>
       </section>
     </main>
+
+    <!-- Print Preview Modal start-->
+    <div
+      id="ExtralargeModal"
+      class="modal-dialog modal-fullscreen"
+      style="display: none"
+    >
+      <div class="modal-content">
+        <div class="modal-body" style="padding: 5px">
+          <div class="row text-center" id="printHeader"></div>
+          <div class="row" id="printBody" style="margin: 10px"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Vendor JS Files -->
-    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/chart.js/chart.umd.js"></script>
-    <script src="assets/vendor/echarts/echarts.min.js"></script>
-    <script src="assets/vendor/moment.js"></script>
-    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/jquery-3.7.1.min.js"></script>
     <script src="./idb.js"></script>
 
     <!-- Template Main JS File -->

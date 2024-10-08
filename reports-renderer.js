@@ -1,7 +1,7 @@
 let dbName;
 let version;
 let data = [];
-const rowsPerPage = 5;
+const rowsPerPage = 10;
 let currentPage = 1;
 
 document.getElementById("btnClose").addEventListener("click", (e) => {
@@ -35,7 +35,7 @@ function PopulateRow(d) {
   } else {
     row = document.createElement("tr");
     row.setAttribute("id", "row-" + d.visitesId);
-    row.dataset.data = JSON.stringify(d);
+    //row.dataset.data = JSON.stringify(d);
     el.appendChild(row);
   }
 
@@ -114,11 +114,52 @@ function exportToCSV() {
   a.click();
 }
 
+/*********** Export to PDF ********* */
+function exportToPDF() {
+  let htmlTable = "<table>" + $("#reportTable").html() + "</table>";
+  console.log(htmlTable);
+
+  $("#printBody").html(htmlTable);
+  $("#ExtralargeModal").css("display", "block");
+  $("#mainContain").css("display", "none");
+  window.print();
+}
+
+function populateDepartmentCombo(d) {
+  let displayId = "departmentList";
+  var sel = document.getElementById(displayId);
+  var options = document.querySelectorAll("#" + displayId + " option");
+  options.forEach((o) => o.remove());
+  let results = d.results;
+  for (var i in results) {
+    if (i == 0) {
+      var opt = document.createElement("option");
+      opt.value = "All";
+      opt.text = "Select Department";
+      sel.appendChild(opt);
+    }
+    var opt = document.createElement("option");
+    opt.value = results[i].id;
+    opt.text = results[i].name;
+
+    sel.appendChild(opt);
+  }
+}
+
 function prepareInt(d) {
   dbName = d.database.dbName;
   version = d.database.version;
 
   let reportType = document.getElementById("report-type").value;
+
+  //Retriving all Department Names
+  let depdb = new idb(dbName, version);
+  let depParam = {
+    operation: "getAll",
+    objstore: "Departments",
+    index: "name",
+  };
+  depdb.openDB(depParam, populateDepartmentCombo);
 
   //Retriving all latest Visites
   let visitesDb = new idb(dbName, version);
