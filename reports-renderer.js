@@ -61,13 +61,18 @@ function PopulateRow(d) {
   row.appendChild(node);
 }
 
-function displayTable(page) {
+function displayTable(page, records) {
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const slicedData = data.slice(startIndex, endIndex);
+  const slicedData = records.slice(startIndex, endIndex);
   const table = document.getElementById("reportTable");
   const el = table.getElementsByTagName("tbody")[0];
-  el.innerHTML = "";
+  if (records.length > 0) {
+    el.innerHTML = "";
+  } else {
+    el.innerHTML =
+      '<tr class="table-danger"><td scope="row" colspan="5">No Data found.</td></tr>';
+  }
   slicedData.forEach(PopulateRow);
   updatePagination(page);
 }
@@ -82,7 +87,7 @@ function updatePagination(currentPage) {
     pageLink.href = "#";
     pageLink.innerText = i;
     pageLink.onclick = function () {
-      displayTable(i);
+      displayTable(i, data);
     };
     if (i === currentPage) {
       pageLink.style.fontWeight = "bold";
@@ -98,7 +103,7 @@ function updatePagination(currentPage) {
 function initPopulateList(d) {
   if (Array.isArray(d.results)) {
     data = d.results;
-    displayTable(currentPage);
+    displayTable(currentPage, data);
   }
 }
 
@@ -127,8 +132,21 @@ function exportToPDF() {
 
 /**************** Featch Records *************** */
 function featchRecords() {
-  let fromDate = "";
-  let toDate = "";
+  let fromDate = $("#from-date").val();
+  let toDate = $("#to-date").val();
+  let depId = $("#departmentList").val();
+
+  let fromObj = fromDate.split("-");
+  let toObj = toDate.split("-");
+  let fromTime = 0;
+  let toTime = new Date().getTime();
+
+  if (fromObj.length > 1) {
+    fromTime = new Date(fromObj[0], fromObj[1] - 1, fromObj[2]).getTime();
+  }
+  if (toObj.length > 1) {
+    toTime = new Date(toObj[0], toObj[1] - 1, toObj[2], 24, 0, 0).getTime();
+  }
 
   //Retriving all latest Visites
   let visitesDb = new idb(dbName, version);
@@ -137,8 +155,30 @@ function featchRecords() {
     objstore: "Visites",
     index: "name",
     orderBy: "prev",
+    extraParam: { from: fromTime, to: toTime, dep: depId },
   };
-  visitesDb.openDB(visitesParam, initPopulateList);
+  visitesDb.openDB(visitesParam, filterList);
+}
+
+function filterList(d) {
+  data = [];
+
+  console.log(d.param.extraParam.dep);
+  for (var i = 0; i < d.results.length; i++) {
+    console.log(d.results[i]);
+    if (
+      d.results[i].visitingTime > d.param.extraParam.from &&
+      d.results[i].visitingTime < d.param.extraParam.to
+    ) {
+      if (
+        d.param.extraParam.dep == "All" ||
+        d.param.extraParam.dep == d.results[i].departmentId
+      ) {
+        data.push(d.results[i]);
+      }
+    }
+  }
+  displayTable(currentPage, data);
 }
 
 function populateDepartmentCombo(d) {
