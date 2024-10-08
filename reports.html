@@ -69,7 +69,7 @@
                         aria-label="Default select example"
                         id="departmentList"
                       >
-                        <option selected="">Select Department</option>
+                        <option selected="all">Select Department</option>
                       </select>
                     </div>
                     <div class="input-group mb-3" style="margin-left: 5px">
@@ -80,6 +80,7 @@
                         type="date"
                         class="form-control"
                         aria-describedby="basic-fromdate"
+                        id="from-date"
                       />
                     </div>
                     <div class="input-group mb-3" style="margin-left: 5px">
@@ -90,6 +91,7 @@
                         type="date"
                         class="form-control"
                         aria-describedby="basic-todate"
+                        id="to-date"
                       />
                     </div>
                     <div class="input-group mb-3" style="margin-left: 5px">
@@ -119,8 +121,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="table-danger">
-                      <td scope="row" colspan="5">No Data found.</td>
+                    <tr>
+                      <td scope="row" colspan="5">Retrieving...</td>
                     </tr>
                   </tbody>
                 </table>
