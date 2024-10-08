@@ -125,6 +125,22 @@ function exportToPDF() {
   window.print();
 }
 
+/**************** Featch Records *************** */
+function featchRecords() {
+  let fromDate = "";
+  let toDate = "";
+
+  //Retriving all latest Visites
+  let visitesDb = new idb(dbName, version);
+  let visitesParam = {
+    operation: "getAll",
+    objstore: "Visites",
+    index: "name",
+    orderBy: "prev",
+  };
+  visitesDb.openDB(visitesParam, initPopulateList);
+}
+
 function populateDepartmentCombo(d) {
   let displayId = "departmentList";
   var sel = document.getElementById(displayId);
