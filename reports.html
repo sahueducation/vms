@@ -116,7 +116,7 @@
                       <th scope="col">Name</th>
                       <th scope="col">Contact Number</th>
                       <th scope="col">City</th>
-                      <th scope="col" data-type="date">Visiting Date</th>
+                      <th scope="col">Visiting Date</th>
                       <th scope="col">Department</th>
                     </tr>
                   </thead>
@@ -187,7 +187,12 @@
       <div class="modal-content">
         <div class="modal-body" style="padding: 5px">
           <div class="row text-center" id="printHeader"></div>
-          <div class="row" id="printBody" style="margin: 10px"></div>
+          <div class="row" style="margin: 10px">
+            <table class="table table-bordered border-primary" id="exportTable">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

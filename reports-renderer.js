@@ -25,23 +25,23 @@ function formatedTime(d) {
   return { date: date, time: time };
 }
 
-function PopulateRow(d) {
-  const table = document.getElementById("reportTable");
-  const el = table.getElementsByTagName("tbody")[0];
+function populateRowForReportTable(d) {
+  PopulateRow(d, "reportTable");
+}
 
-  let row = document.getElementById("row-" + d.visitesId);
-  if (row) {
-    row.innerHTML = "";
-  } else {
-    row = document.createElement("tr");
-    row.setAttribute("id", "row-" + d.visitesId);
-    //row.dataset.data = JSON.stringify(d);
-    el.appendChild(row);
-  }
+function populateRowForExportTable(d) {
+  PopulateRow(d, "exportTable");
+}
+
+function PopulateRow(d, tableId) {
+  let table = document.getElementById(tableId);
+  let el = table.getElementsByTagName("tbody")[0];
+
+  row = document.createElement("tr");
+  el.appendChild(row);
 
   let node = document.createElement("td");
   node.innerText = d.name;
-  //node.setAttribute("scope", "row");
   row.appendChild(node);
 
   node = document.createElement("td");
@@ -62,18 +62,19 @@ function PopulateRow(d) {
 }
 
 function displayTable(page, records) {
-  const startIndex = (page - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const slicedData = records.slice(startIndex, endIndex);
-  const table = document.getElementById("reportTable");
-  const el = table.getElementsByTagName("tbody")[0];
+  let startIndex = (page - 1) * rowsPerPage;
+  let endIndex = startIndex + rowsPerPage;
+  let slicedData = records.slice(startIndex, endIndex);
+  let table = document.getElementById("reportTable");
+  let el = table.getElementsByTagName("tbody")[0];
   if (records.length > 0) {
     el.innerHTML = "";
   } else {
     el.innerHTML =
       '<tr class="table-danger"><td scope="row" colspan="5">No Data found.</td></tr>';
   }
-  slicedData.forEach(PopulateRow);
+  slicedData.forEach(populateRowForReportTable);
+
   updatePagination(page);
 }
 
@@ -107,11 +108,19 @@ function initPopulateList(d) {
   }
 }
 
+function populateExportTable() {
+  $("#exportTable thead").html($("#reportTable thead").html());
+  $("#exportTable tbody").html("");
+  data.forEach(populateRowForExportTable);
+}
+
 /*********** Export to CSV ********* */
 function exportToCSV() {
-  let tableData = document.getElementById("reportTable").outerHTML;
-  tableData = tableData.replace(/<A[^>]*>|<\/A>/g, ""); //remove if u want links in your table
-  tableData = tableData.replace(/<input[^>]*>|<\/input>/gi, ""); //remove input params
+  populateExportTable();
+
+  let tableData = document.getElementById("exportTable").outerHTML;
+  //tableData = tableData.replace(/<A[^>]*>|<\/A>/g, ""); //remove if u want links in your table
+  //tableData = tableData.replace(/<input[^>]*>|<\/input>/gi, ""); //remove input params
 
   let a = document.createElement("a");
   a.href = `data:application/vnd.ms-excel, ${encodeURIComponent(tableData)}`;
@@ -121,12 +130,7 @@ function exportToCSV() {
 
 /*********** Export to PDF ********* */
 function exportToPDF() {
-  let htmlTable = "<table>" + $("#reportTable").html() + "</table>";
-  console.log(htmlTable);
-
-  $("#printBody").html(htmlTable);
-  $("#ExtralargeModal").css("display", "block");
-  $("#mainContain").css("display", "none");
+  populateExportTable();
   window.print();
 }
 
@@ -163,9 +167,7 @@ function featchRecords() {
 function filterList(d) {
   data = [];
 
-  console.log(d.param.extraParam.dep);
   for (var i = 0; i < d.results.length; i++) {
-    console.log(d.results[i]);
     if (
       d.results[i].visitingTime > d.param.extraParam.from &&
       d.results[i].visitingTime < d.param.extraParam.to
