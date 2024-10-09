@@ -41,6 +41,11 @@ document.getElementById("departmentReports").addEventListener("click", (e) => {
   window.electronAPI.setReports("dep");
 });
 
+document.getElementById("staffReports").addEventListener("click", (e) => {
+  e.preventDefault();
+  window.electronAPI.setReports("stf");
+});
+
 function populateCounts(d) {
   document.getElementById("todayCounts").innerHTML = "<h6>" + d + "</h6>";
   document.getElementById("todayCounts").dataset.count = d;
