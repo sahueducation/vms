@@ -95,50 +95,26 @@ ipcMain.on("set-conf", (event, data) => {
 });
 
 ipcMain.on("set-reports", (event, data) => {
-  if (data == "y") {
-    const webContents = event.sender;
-    const pWin = BrowserWindow.fromWebContents(webContents);
-    const child = new BrowserWindow({
-      parent: pWin,
-      modal: true,
-      show: false,
-      width: 1100,
-      height: 800,
-      webPreferences: {
-        preload: path.join(__dirname, "reports-preload.js"),
-      },
-    });
-    child.loadFile("reports.html");
-    child.once("ready-to-show", () => {
-      child.show();
-    });
+  const webContents = event.sender;
+  const pWin = BrowserWindow.fromWebContents(webContents);
+  const child = new BrowserWindow({
+    parent: pWin,
+    modal: true,
+    show: false,
+    width: 1100,
+    height: 800,
+    webPreferences: {
+      preload: path.join(__dirname, "reports-preload.js"),
+    },
+  });
+  child.loadFile("reports.html");
+  child.once("ready-to-show", () => {
+    child.show();
+  });
 
-    let wc = child.webContents;
-    wc.openDevTools({ mode: "undocked" });
-  } else if (data == "dep") {
-    const webContents = event.sender;
-    const pWin = BrowserWindow.fromWebContents(webContents);
-    const child = new BrowserWindow({
-      parent: pWin,
-      modal: true,
-      show: false,
-      width: 1100,
-      height: 800,
-      webPreferences: {
-        preload: path.join(__dirname, "reports-preload.js"),
-      },
-    });
-    child.loadFile("reports.html");
-
-    child.once("ready-to-show", () => {
-      child.show();
-      //child.send("report-type", "dep");
-    });
-
-    let wc = child.webContents;
-    wc.openDevTools({ mode: "undocked" });
-    wc.send("report-type", "dep");
-  }
+  let wc = child.webContents;
+  wc.openDevTools({ mode: "undocked" });
+  wc.send("report-type", data);
 });
 
 ipcMain.on("set-logout", (event, data) => {
