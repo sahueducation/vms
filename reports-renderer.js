@@ -23,6 +23,11 @@ function formatedTime(d) {
     year: "numeric",
   });
 
+  let pattern = /00:\d\d pm/i;
+  if (time.match(pattern)) {
+    time = time.replace(/00:/gi, "12:");
+  }
+  time = time.toUpperCase();
   return { date: date, time: time };
 }
 
@@ -50,11 +55,16 @@ function PopulateRow(d, tableId) {
   row.appendChild(node);
 
   node = document.createElement("td");
-  node.innerText = d.city;
+  node.innerText = d.organization + ", " + d.city;
   row.appendChild(node);
 
   node = document.createElement("td");
-  node.innerText = formatedTime(d.visitingTime).date;
+  let dateObj = formatedTime(d.visitingTime);
+  node.innerText = dateObj.date + " " + dateObj.time;
+  row.appendChild(node);
+
+  node = document.createElement("td");
+  node.innerText = d.purpose;
   row.appendChild(node);
 
   node = document.createElement("td");
@@ -107,6 +117,7 @@ function updatePagination(currentPage) {
 }
 
 function initPopulateList(d) {
+  console.log(d);
   if (Array.isArray(d.results)) {
     G_data = d.results;
     displayTable(G_currentPage, G_data);

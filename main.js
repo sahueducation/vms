@@ -101,7 +101,7 @@ ipcMain.on("set-reports", (event, data) => {
     parent: pWin,
     modal: true,
     show: false,
-    width: 1100,
+    width: 1200,
     height: 800,
     webPreferences: {
       preload: path.join(__dirname, "reports-preload.js"),
