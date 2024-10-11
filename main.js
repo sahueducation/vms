@@ -2,7 +2,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
-const { session } = require("electron");
 
 const createWindow = (fName) => {
   // Create the browser window.
@@ -21,9 +20,6 @@ const createWindow = (fName) => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
-
-  //const ses = mainWindow.webContents.session;
-  //console.log(ses.getUserAgent());
 };
 
 ipcMain.on("set-user-credentials", (event, status) => {
