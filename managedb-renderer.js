@@ -1,6 +1,6 @@
 let dbName;
 let version;
-
+var jsstoreCon;
 /**********************FOR TESTING PURPOSE********************/
 
 /**********************FOR TESTING PURPOSE********************/
@@ -9,6 +9,82 @@ document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.quiteWindow("y");
 });
+
+function importData() {
+  msgHandler({ status: "success", message: "Performing Testing..." });
+
+  jsstoreCon = new JsStore.Connection();
+
+  const initiatingDb = async () => {
+    return initDb();
+  };
+  initiatingDb().then((data) => msgHandler(data));
+
+  const insertingStates = async () => {
+    return insertStates(states);
+  };
+  insertingStates().then((data) => msgHandler(data));
+}
+
+async function initDb() {
+  var isDbCreated = await jsstoreCon.initDb(getDbSchema());
+  if (isDbCreated) {
+    return { status: "success", message: "db created" };
+  } else {
+    return { status: "success", message: "db opened" };
+  }
+}
+
+function getDbSchema() {
+  var table = {
+    name: "States",
+    columns: {
+      steteId: {
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      name: {
+        notNull: true,
+        dataType: "string",
+      },
+      createdOn: {
+        notNull: true,
+        dataType: "date_time",
+        default: new Date(),
+      },
+      createdBy: {
+        notNull: true,
+        dataType: "number",
+        default: 1,
+      },
+      updatedOn: {
+        notNull: true,
+        dataType: "date_time",
+        default: new Date(),
+      },
+      updatedBy: {
+        notNull: true,
+        dataType: "number",
+        default: 1,
+      },
+    },
+  };
+
+  var db = {
+    name: dbName,
+    tables: [table],
+  };
+  return db;
+}
+
+async function insertStates(values) {
+  var insertCount = await jsstoreCon.insert({
+    into: "States",
+    values: values,
+  });
+
+  return { status: "success", message: `${insertCount} rows inserted` };
+}
 
 function runScript() {
   var version = 28;
