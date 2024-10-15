@@ -1,3 +1,19 @@
+async function initDb() {
+  jsstoreCon = new JsStore.Connection();
+  var isDbCreated = await jsstoreCon.initDb(getDbSchema(dbName));
+  if (isDbCreated) {
+    return {
+      status: "success",
+      message: `DB ${dbName} is created successfuly.`,
+    };
+  } else {
+    return {
+      status: "success",
+      message: `DB ${dbName} is opened successfuly.`,
+    };
+  }
+}
+
 function getDbSchema(dbName) {
   var statesTable = statesSchema();
   var departmentsTable = departmentsSchema();
@@ -5,6 +21,7 @@ function getDbSchema(dbName) {
   var designationTable = designationSchema();
   var idProofsTable = idProofsSchema();
   var staffTable = staffSchema();
+  var operatorsTable = operatorsSchema();
 
   var db = {
     name: dbName,
@@ -15,6 +32,7 @@ function getDbSchema(dbName) {
       designationTable,
       idProofsTable,
       staffTable,
+      operatorsTable,
     ],
   };
   return db;
@@ -33,22 +51,18 @@ function statesSchema() {
         dataType: "string",
       },
       createdOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       createdBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
       updatedOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       updatedBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
@@ -71,22 +85,18 @@ function departmentsSchema() {
         dataType: "string",
       },
       createdOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       createdBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
       updatedOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       updatedBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
@@ -109,22 +119,18 @@ function categoriesSchema() {
         dataType: "string",
       },
       createdOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       createdBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
       updatedOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       updatedBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
@@ -147,22 +153,18 @@ function designationSchema() {
         dataType: "string",
       },
       createdOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       createdBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
       updatedOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       updatedBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
@@ -185,22 +187,18 @@ function idProofsSchema() {
         dataType: "string",
       },
       createdOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       createdBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
       updatedOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       updatedBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
@@ -247,22 +245,68 @@ function staffSchema() {
       },
       otherDetails: { dataType: "string" },
       createdOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       createdBy: {
-        notNull: true,
         dataType: "number",
         default: 1,
       },
       updatedOn: {
-        notNull: true,
         dataType: "number",
         default: new Date().getTime(),
       },
       updatedBy: {
+        dataType: "number",
+        default: 1,
+      },
+    },
+  };
+
+  return table;
+}
+
+function operatorsSchema() {
+  var table = {
+    name: "Operators",
+    columns: {
+      id: {
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      userName: {
         notNull: true,
+        dataType: "string",
+      },
+      userPassword: {
+        notNull: true,
+        dataType: "string",
+      },
+      otherDetails: {
+        dataType: "string",
+      },
+      userRole: {
+        dataType: "string",
+      },
+      passwordUpdatedOn: {
+        dataType: "number",
+      },
+      isLogedIn: {
+        dataType: "string",
+      },
+      createdOn: {
+        dataType: "number",
+        default: new Date().getTime(),
+      },
+      createdBy: {
+        dataType: "number",
+        default: 1,
+      },
+      updatedOn: {
+        dataType: "number",
+        default: new Date().getTime(),
+      },
+      updatedBy: {
         dataType: "number",
         default: 1,
       },

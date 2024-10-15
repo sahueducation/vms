@@ -182,22 +182,6 @@ function deleteRecord(o) {
   removeData().then((data) => messageHandler(data));
 }
 
-async function initDb() {
-  jsstoreCon = new JsStore.Connection();
-  var isDbCreated = await jsstoreCon.initDb(getDbSchema(dbName));
-  if (isDbCreated) {
-    return {
-      status: "success",
-      message: `DB ${dbName} is created successfuly.`,
-    };
-  } else {
-    return {
-      status: "success",
-      message: `DB ${dbName} is opened successfuly.`,
-    };
-  }
-}
-
 function fetchMasterData(table) {
   const fetchData = async () => {
     return selectAll(table);
