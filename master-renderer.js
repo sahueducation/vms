@@ -2,6 +2,7 @@ let dbName;
 let version;
 let footerContain;
 let headerContain;
+let jsstoreCon;
 
 document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
@@ -9,7 +10,7 @@ document.getElementById("btnCancel").addEventListener("click", (e) => {
 });
 
 function populateFild(d) {
-  let displayId = d.param.objstore + "List";
+  let displayId = d.objstore + "List";
   var sel = document.getElementById(displayId);
   var options = document.querySelectorAll("#" + displayId + " option");
   options.forEach((o) => o.remove());
@@ -39,37 +40,88 @@ function formSubmit(o) {
   let objstoreName = o[0].id;
   let ctime = new Date().getTime();
 
-  let data = {
-    name: catName,
-    createdDate: ctime,
-    createdBy: 1,
-    updatedDate: ctime,
-    updatedBy: 1,
-  };
-  let param = {
-    operation: "add",
-    objstore: objstoreName,
-    index: "name",
-    data: data,
-  };
+  let data = [
+    {
+      name: catName,
+      createdOn: ctime,
+      createdBy: 1,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
-  let mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  //Inserting data ...
+  const insertingData = async () => {
+    return insert(objstoreName, data);
+  };
+  insertingData().then((data) => messageHandler(data));
 
   return false;
 }
 
+async function selectAll(storeName) {
+  var results = await jsstoreCon.select({
+    from: storeName,
+  });
+
+  return { results: results, objstore: storeName };
+}
+
+async function insert(storeName, values) {
+  var insertCount = await jsstoreCon.insert({
+    into: storeName,
+    values: values,
+  });
+
+  return {
+    status: "success",
+    objstore: storeName,
+    message: `${insertCount} record inserted successfuly`,
+    operation: "add",
+  };
+}
+
+async function update(storeName, id, value) {
+  var rowsUpdated = await jsstoreCon.update({
+    in: storeName,
+    where: {
+      id: id,
+    },
+    set: {
+      name: value,
+    },
+  });
+
+  return {
+    status: "success",
+    objstore: storeName,
+    message: `${rowsUpdated} record updated successfuly`,
+    operation: "edit",
+  };
+}
+
+async function remove(storeName, id) {
+  var rowsDeleted = await jsstoreCon.remove({
+    from: storeName,
+    where: {
+      id: id,
+    },
+  });
+
+  return {
+    status: "success",
+    objstore: storeName,
+    message: `${rowsDeleted} record removed successfuly`,
+    operation: "remove",
+  };
+}
+
 function messageHandler(m) {
   if (m.status == "success") {
-    let storeName = m.param.objstore;
+    let storeName = m.objstore;
     document.getElementById(storeName).value = "";
-    let param = {
-      operation: "getAll",
-      objstore: storeName,
-      index: "name",
-    };
-    let mydb = new idb(dbName, version);
-    mydb.openDB(param, populateFild);
+
+    fetchMasterData(storeName);
     alert(m.message);
     if (m.operation == "edit")
       document.getElementById("btnClose" + storeName).click();
@@ -114,76 +166,64 @@ function updateRecord(o) {
   var value = document.getElementById("edit" + storeName).value;
   var key = document.getElementById("edit" + storeName).dataset.keyvalue;
 
-  let param = {
-    operation: "edit",
-    objstore: storeName,
-    index: "name",
-    key: Number(key),
-    value: value,
+  const updateData = async () => {
+    return update(storeName, Number(key), value);
   };
-
-  let mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  updateData().then((data) => messageHandler(data));
 }
 
 function deleteRecord(o) {
   let storeName = o.id.replace("btnDelete", "");
   var key = document.getElementById(storeName + "List").value;
 
-  let param = {
-    operation: "delete",
-    objstore: storeName,
-    index: "name",
-    key: Number(key),
+  const removeData = async () => {
+    return remove(storeName, Number(key));
   };
-  let mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  removeData().then((data) => messageHandler(data));
+}
+
+async function initDb() {
+  jsstoreCon = new JsStore.Connection();
+  var isDbCreated = await jsstoreCon.initDb(getDbSchema(dbName));
+  if (isDbCreated) {
+    return {
+      status: "success",
+      message: `DB ${dbName} is created successfuly.`,
+    };
+  } else {
+    return {
+      status: "success",
+      message: `DB ${dbName} is opened successfuly.`,
+    };
+  }
+}
+
+function fetchMasterData(table) {
+  const fetchData = async () => {
+    return selectAll(table);
+  };
+  fetchData().then((data) => populateFild(data));
 }
 
 function prepareInt(d) {
   dbName = d.database.dbName;
   version = d.database.version;
 
+  initDb();
   //Retriving all States Names
-  let mydb = new idb(dbName, version);
-  let param = { operation: "getAll", objstore: "States", index: "name" };
-  mydb.openDB(param, populateFild);
+  fetchMasterData("States");
 
   //Retriving all Department Names
-  let depdb = new idb(dbName, version);
-  let depParam = {
-    operation: "getAll",
-    objstore: "Departments",
-    index: "name",
-  };
-  depdb.openDB(depParam, populateFild);
+  fetchMasterData("Departments");
 
   //Retriving all User Category
-  let catdb = new idb(dbName, version);
-  let catParam = {
-    operation: "getAll",
-    objstore: "VisitorCategory",
-    index: "name",
-  };
-  catdb.openDB(catParam, populateFild);
+  fetchMasterData("VisitorCategory");
 
   //Retriving all Designations
-  let desigdb = new idb(dbName, version);
-  let desigdbParam = {
-    operation: "getAll",
-    objstore: "Designation",
-    index: "name",
-  };
-  desigdb.openDB(desigdbParam, populateFild);
+  fetchMasterData("Designation");
 
-  //Retriving all Designations
-  let idproofdb = new idb(dbName, version);
-  let idproofParam = {
-    operation: "getAll",
-    objstore: "IDProof",
-    index: "name",
-  };
-  idproofdb.openDB(idproofParam, populateFild);
+  //Retriving all IdProof
+  fetchMasterData("IDProof");
 
   //Populate Header Contents
   populateContent(d);

@@ -11,70 +11,58 @@ document.getElementById("btnCancel").addEventListener("click", (e) => {
 });
 
 function importData() {
-  msgHandler({ status: "success", message: "Performing Testing..." });
-
-  jsstoreCon = new JsStore.Connection();
+  msgHandler({ status: "success", message: "Performing DB preparation..." });
 
   const initiatingDb = async () => {
     return initDb();
   };
   initiatingDb().then((data) => msgHandler(data));
 
+  //Inserting States data ...
   const insertingStates = async () => {
     return insertStates(states);
   };
   insertingStates().then((data) => msgHandler(data));
+
+  //Inserting Departments data ...
+  const insertingDepartments = async () => {
+    return insertDepartments(departments);
+  };
+  insertingDepartments().then((data) => msgHandler(data));
+
+  //Inserting Categories data ...
+  const insertingCategories = async () => {
+    return insertCategories(categories);
+  };
+  insertingCategories().then((data) => msgHandler(data));
+
+  //Inserting Designation data ...
+  const insertingDesignation = async () => {
+    return insertDesignation(designation);
+  };
+  insertingDesignation().then((data) => msgHandler(data));
+
+  //Inserting Idproofs data ...
+  const insertingIdproofs = async () => {
+    return insertIdproofs(idProofs);
+  };
+  insertingIdproofs().then((data) => msgHandler(data));
 }
 
 async function initDb() {
-  var isDbCreated = await jsstoreCon.initDb(getDbSchema());
+  jsstoreCon = new JsStore.Connection();
+  var isDbCreated = await jsstoreCon.initDb(getDbSchema(dbName));
   if (isDbCreated) {
-    return { status: "success", message: "db created" };
+    return {
+      status: "success",
+      message: `DB ${dbName} is created successfuly.`,
+    };
   } else {
-    return { status: "success", message: "db opened" };
+    return {
+      status: "success",
+      message: `DB ${dbName} is opened successfuly.`,
+    };
   }
-}
-
-function getDbSchema() {
-  var table = {
-    name: "States",
-    columns: {
-      steteId: {
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      name: {
-        notNull: true,
-        dataType: "string",
-      },
-      createdOn: {
-        notNull: true,
-        dataType: "date_time",
-        default: new Date(),
-      },
-      createdBy: {
-        notNull: true,
-        dataType: "number",
-        default: 1,
-      },
-      updatedOn: {
-        notNull: true,
-        dataType: "date_time",
-        default: new Date(),
-      },
-      updatedBy: {
-        notNull: true,
-        dataType: "number",
-        default: 1,
-      },
-    },
-  };
-
-  var db = {
-    name: dbName,
-    tables: [table],
-  };
-  return db;
 }
 
 async function insertStates(values) {
@@ -83,7 +71,58 @@ async function insertStates(values) {
     values: values,
   });
 
-  return { status: "success", message: `${insertCount} rows inserted` };
+  return {
+    status: "success",
+    message: `${insertCount} rows inserted in States table`,
+  };
+}
+
+async function insertDepartments(values) {
+  var insertCount = await jsstoreCon.insert({
+    into: "Departments",
+    values: values,
+  });
+
+  return {
+    status: "success",
+    message: `${insertCount} rows inserted in Departments table`,
+  };
+}
+
+async function insertCategories(values) {
+  var insertCount = await jsstoreCon.insert({
+    into: "VisitorCategory",
+    values: values,
+  });
+
+  return {
+    status: "success",
+    message: `${insertCount} rows inserted in VisitorCategory table`,
+  };
+}
+
+async function insertDesignation(values) {
+  var insertCount = await jsstoreCon.insert({
+    into: "Designation",
+    values: values,
+  });
+
+  return {
+    status: "success",
+    message: `${insertCount} rows inserted in Designation table`,
+  };
+}
+
+async function insertIdproofs(values) {
+  var insertCount = await jsstoreCon.insert({
+    into: "IDProof",
+    values: values,
+  });
+
+  return {
+    status: "success",
+    message: `${insertCount} rows inserted in IDProof table`,
+  };
 }
 
 function runScript() {
@@ -93,18 +132,8 @@ function runScript() {
   //createStaffDetails(dbName, version);
   //deleteDesignation(dbName, version);
   //deleteStaffDetails(dbName, version);
-  console.log("Started");
-  createIdProof(dbName, version);
-}
-
-function deleteDesignation(d, v) {
-  let param = {
-    operation: "deleteStore",
-    objstore: "Designation",
-  };
-
-  let mydb = new idb(d, v);
-  mydb.openDB(param, msgHandler);
+  //console.log("Started");
+  //createIdProof(dbName, version);
 }
 
 function deleteStaffDetails(d, v) {
@@ -155,105 +184,6 @@ function createStaffDetails(d, v) {
   };
 
   const mydb = new idb(d, v);
-  mydb.openDB(param, msgHandler);
-
-  return;
-}
-
-function createDesignation(db, version) {
-  const ctime = new Date();
-  const data = [
-    {
-      designationId: 1,
-      name: "Director",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      designationId: 2,
-      name: "Manager",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-  ];
-
-  const indexParam = [
-    { indexName: "designationId", unique: true },
-    { indexName: "name", unique: true },
-  ];
-
-  const param = {
-    operation: "createStore",
-    objstore: "Designation",
-    keyPath: "designationId",
-    autoIncrement: true,
-    indexed: indexParam,
-    data: data,
-  };
-
-  const mydb = new idb(db, version);
-  mydb.openDB(param, msgHandler);
-
-  return;
-}
-
-function createIdProof(db, version) {
-  console.log("In createIdProff function");
-  const ctime = new Date();
-  const data = [
-    {
-      id: 1,
-      name: "Aadhar Card",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      id: 2,
-      name: "Voter Card",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      id: 3,
-      name: "PAN Card",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      id: 4,
-      name: "Driving License",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-  ];
-
-  const indexParam = [
-    { indexName: "id", unique: true },
-    { indexName: "name", unique: true },
-  ];
-
-  const param = {
-    operation: "createStore",
-    objstore: "IDProof",
-    keyPath: "id",
-    autoIncrement: true,
-    indexed: indexParam,
-    data: data,
-  };
-  console.log(param);
-  const mydb = new idb(db, version);
   mydb.openDB(param, msgHandler);
 
   return;
