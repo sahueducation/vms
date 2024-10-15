@@ -49,22 +49,6 @@ function importData() {
   insertingIdproofs().then((data) => msgHandler(data));
 }
 
-async function initDb() {
-  jsstoreCon = new JsStore.Connection();
-  var isDbCreated = await jsstoreCon.initDb(getDbSchema(dbName));
-  if (isDbCreated) {
-    return {
-      status: "success",
-      message: `DB ${dbName} is created successfuly.`,
-    };
-  } else {
-    return {
-      status: "success",
-      message: `DB ${dbName} is opened successfuly.`,
-    };
-  }
-}
-
 async function insertStates(values) {
   var insertCount = await jsstoreCon.insert({
     into: "States",
@@ -123,70 +107,6 @@ async function insertIdproofs(values) {
     status: "success",
     message: `${insertCount} rows inserted in IDProof table`,
   };
-}
-
-function runScript() {
-  var version = 28;
-  //createStaffDetails();
-  //createDesignation(dbName, version);
-  //createStaffDetails(dbName, version);
-  //deleteDesignation(dbName, version);
-  //deleteStaffDetails(dbName, version);
-  //console.log("Started");
-  //createIdProof(dbName, version);
-}
-
-function deleteStaffDetails(d, v) {
-  let param = {
-    operation: "deleteStore",
-    objstore: "StaffDetails",
-  };
-
-  let mydb = new idb(d, v);
-  mydb.openDB(param, msgHandler);
-}
-
-function createStaffDetails(d, v) {
-  const ctime = new Date();
-  const data = [
-    {
-      staffId: 1,
-      designationId: 1,
-      designation: "Director",
-      name: "Mr. Sahu",
-      extension: "111",
-      phonenumber: "1212121212",
-      depId: 1,
-      depName: "IT",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-  ];
-
-  const indexParam = [
-    { indexName: "designationId", unique: false },
-    { indexName: "designation", unique: false },
-    { indexName: "name", unique: false },
-    { indexName: "depId", unique: false },
-    { indexName: "depName", unique: false },
-    { indexName: "phonenumber", unique: false },
-  ];
-
-  const param = {
-    operation: "createStore",
-    objstore: "StaffDetails",
-    keyPath: "staffId",
-    autoIncrement: true,
-    indexed: indexParam,
-    data: data,
-  };
-
-  const mydb = new idb(d, v);
-  mydb.openDB(param, msgHandler);
-
-  return;
 }
 
 function msgHandler(m) {

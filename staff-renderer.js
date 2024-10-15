@@ -208,22 +208,6 @@ function initStaffTable(d) {
   }
 }
 
-async function initDb() {
-  jsstoreCon = new JsStore.Connection();
-  var isDbCreated = await jsstoreCon.initDb(getDbSchema(dbName));
-  if (isDbCreated) {
-    return {
-      status: "success",
-      message: `DB ${dbName} is created successfuly.`,
-    };
-  } else {
-    return {
-      status: "success",
-      message: `DB ${dbName} is opened successfuly.`,
-    };
-  }
-}
-
 async function selectAll(storeName) {
   var results = await jsstoreCon.select({
     from: storeName,
