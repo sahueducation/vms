@@ -19,94 +19,26 @@ function importData() {
   initiatingDb().then((data) => msgHandler(data));
 
   //Inserting States data ...
-  const insertingStates = async () => {
-    return insertStates(states);
-  };
-  insertingStates().then((data) => msgHandler(data));
+  insertingDataInToTable("States", states);
 
   //Inserting Departments data ...
-  const insertingDepartments = async () => {
-    return insertDepartments(departments);
-  };
-  insertingDepartments().then((data) => msgHandler(data));
+  insertingDataInToTable("Departments", departments);
 
   //Inserting Categories data ...
-  const insertingCategories = async () => {
-    return insertCategories(categories);
-  };
-  insertingCategories().then((data) => msgHandler(data));
+  insertingDataInToTable("VisitorCategory", categories);
 
   //Inserting Designation data ...
-  const insertingDesignation = async () => {
-    return insertDesignation(designation);
-  };
-  insertingDesignation().then((data) => msgHandler(data));
+  insertingDataInToTable("Designation", designation);
 
   //Inserting Idproofs data ...
-  const insertingIdproofs = async () => {
-    return insertIdproofs(idProofs);
-  };
-  insertingIdproofs().then((data) => msgHandler(data));
+  insertingDataInToTable("IDProof", idProofs);
 }
 
-async function insertStates(values) {
-  var insertCount = await jsstoreCon.insert({
-    into: "States",
-    values: values,
-  });
-
-  return {
-    status: "success",
-    message: `${insertCount} rows inserted in States table`,
+function insertingDataInToTable(table, value) {
+  const insertingData = async () => {
+    return insertInToTable(table, value);
   };
-}
-
-async function insertDepartments(values) {
-  var insertCount = await jsstoreCon.insert({
-    into: "Departments",
-    values: values,
-  });
-
-  return {
-    status: "success",
-    message: `${insertCount} rows inserted in Departments table`,
-  };
-}
-
-async function insertCategories(values) {
-  var insertCount = await jsstoreCon.insert({
-    into: "VisitorCategory",
-    values: values,
-  });
-
-  return {
-    status: "success",
-    message: `${insertCount} rows inserted in VisitorCategory table`,
-  };
-}
-
-async function insertDesignation(values) {
-  var insertCount = await jsstoreCon.insert({
-    into: "Designation",
-    values: values,
-  });
-
-  return {
-    status: "success",
-    message: `${insertCount} rows inserted in Designation table`,
-  };
-}
-
-async function insertIdproofs(values) {
-  var insertCount = await jsstoreCon.insert({
-    into: "IDProof",
-    values: values,
-  });
-
-  return {
-    status: "success",
-    message: `${insertCount} rows inserted in IDProof table`,
-  };
+  insertingData().then((data) => msgHandler(data));
 }
 
 function msgHandler(m) {

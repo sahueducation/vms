@@ -13,27 +13,29 @@ function addStaff() {
 
   const ctime = new Date().getTime();
 
-  const data = {
-    designationId: Number(designationSelectElement.value),
-    designation:
-      designationSelectElement.options[designationSelectElement.selectedIndex]
-        .text,
-    name: document.getElementById("name").value,
-    extension: document.getElementById("extension").value,
-    phonenumber: document.getElementById("phone-number").value,
-    depId: Number(departmentsSelectElement.value),
-    depName:
-      departmentsSelectElement.options[departmentsSelectElement.selectedIndex]
-        .text,
-    otherDetails: document.getElementById("other-details").value,
-    createdOn: ctime,
-    createdBy: 1,
-    updatedOn: ctime,
-    updatedBy: 1,
-  };
+  const data = [
+    {
+      designationId: Number(designationSelectElement.value),
+      designation:
+        designationSelectElement.options[designationSelectElement.selectedIndex]
+          .text,
+      name: document.getElementById("name").value,
+      extension: document.getElementById("extension").value,
+      phonenumber: document.getElementById("phone-number").value,
+      depId: Number(departmentsSelectElement.value),
+      depName:
+        departmentsSelectElement.options[departmentsSelectElement.selectedIndex]
+          .text,
+      otherDetails: document.getElementById("other-details").value,
+      createdOn: ctime,
+      createdBy: 1,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
   const insertingData = async () => {
-    return insert(data);
+    return insertInToTable("StaffDetails", data, "results");
   };
   insertingData().then((data) => messageHandler(data));
 
@@ -43,7 +45,7 @@ function addStaff() {
 function deletStaff(d) {
   if (confirm("Are you sure, want to delete this record?")) {
     const removeData = async () => {
-      return remove("StaffDetails", Number(d));
+      return removeFromTable("StaffDetails", Number(d), { staffId: Number(d) });
     };
     removeData().then((data) => messageHandler(data));
   }
@@ -53,13 +55,13 @@ function messageHandler(m) {
   if (m.status == "success") {
     if (m.operation == "add") {
       document.getElementById("newStaffForm").reset();
-      populateStaffDetailsTable(m.data);
-    } else if (m.operation == "delete") {
+      populateStaffDetailsTable(m.results);
+    } else if (m.operation == "remove") {
       const element = document.getElementById("row-" + m.id);
       element.remove();
     } else if (m.operation == "edit") {
       document.getElementById("btnCloseEditModal").click();
-      populateStaffDetailsTable(m.data);
+      populateStaffDetailsTable(m.results);
     }
   }
   alert(m.message);
@@ -99,22 +101,24 @@ function updateStaff() {
   const OtherDetails = document.getElementById("updateOtherDetails").value;
   const key = document.getElementById("updateStaffId").value;
 
-  const data = {
-    staffId: Number(key),
-    designationId: Number(DesignationId),
-    designation: Designation,
-    name: name,
-    extension: Extension,
-    phonenumber: PhoneNumber,
-    depId: Number(DepartmentsId),
-    depName: Departments,
-    otherDetails: OtherDetails,
-    updatedOn: ctime,
-    updatedBy: 1,
-  };
+  const data = [
+    {
+      staffId: Number(key),
+      designationId: Number(DesignationId),
+      designation: Designation,
+      name: name,
+      extension: Extension,
+      phonenumber: PhoneNumber,
+      depId: Number(DepartmentsId),
+      depName: Departments,
+      otherDetails: OtherDetails,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
   const updateData = async () => {
-    return update("StaffDetails", data);
+    return updateTable("StaffDetails", 0, data, "results");
   };
   updateData().then((data) => messageHandler(data));
 
@@ -206,63 +210,6 @@ function initStaffTable(d) {
     const results = d.results;
     results.forEach(populateStaffDetailsTable);
   }
-}
-
-async function selectAll(storeName) {
-  var results = await jsstoreCon.select({
-    from: storeName,
-  });
-
-  return { results: results, objstore: storeName };
-}
-
-async function insert(values) {
-  var insertedRecord = await jsstoreCon.insert({
-    into: "StaffDetails",
-    values: [values],
-    return: true,
-  });
-
-  return {
-    status: "success",
-    objstore: "StaffDetails",
-    message: `record inserted successfuly`,
-    data: insertedRecord[0],
-    operation: "add",
-  };
-}
-
-async function update(storeName, setValues) {
-  var rowsUpdated = await jsstoreCon.insert({
-    into: storeName,
-    values: [setValues],
-    return: true,
-    upsert: true,
-  });
-
-  return {
-    status: "success",
-    objstore: storeName,
-    message: `Record updated successfuly`,
-    operation: "edit",
-    data: rowsUpdated[0],
-  };
-}
-
-async function remove(storeName, id) {
-  var rowsDeleted = await jsstoreCon.remove({
-    from: storeName,
-    where: {
-      staffId: id,
-    },
-  });
-
-  return {
-    status: "success",
-    id: id,
-    message: `${rowsDeleted} record removed successfuly`,
-    operation: "delete",
-  };
 }
 
 function fetchMasterData(table) {
