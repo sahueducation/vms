@@ -52,68 +52,11 @@ function formSubmit(o) {
 
   //Inserting data ...
   const insertingData = async () => {
-    return insert(objstoreName, data);
+    return insertInToTable(objstoreName, data);
   };
   insertingData().then((data) => messageHandler(data));
 
   return false;
-}
-
-async function selectAll(storeName) {
-  var results = await jsstoreCon.select({
-    from: storeName,
-  });
-
-  return { results: results, objstore: storeName };
-}
-
-async function insert(storeName, values) {
-  var insertCount = await jsstoreCon.insert({
-    into: storeName,
-    values: values,
-  });
-
-  return {
-    status: "success",
-    objstore: storeName,
-    message: `${insertCount} record inserted successfuly`,
-    operation: "add",
-  };
-}
-
-async function update(storeName, id, value) {
-  var rowsUpdated = await jsstoreCon.update({
-    in: storeName,
-    where: {
-      id: id,
-    },
-    set: {
-      name: value,
-    },
-  });
-
-  return {
-    status: "success",
-    objstore: storeName,
-    message: `${rowsUpdated} record updated successfuly`,
-    operation: "edit",
-  };
-}
-
-async function remove(storeName, id) {
-  var rowsDeleted = await jsstoreCon.remove({
-    from: storeName,
-    where: {
-      id: id,
-    },
-  });
-
-  return {
-    status: "success",
-    objstore: storeName,
-    message: `${rowsDeleted} record removed successfuly`,
-    operation: "remove",
-  };
 }
 
 function messageHandler(m) {
@@ -167,7 +110,7 @@ function updateRecord(o) {
   var key = document.getElementById("edit" + storeName).dataset.keyvalue;
 
   const updateData = async () => {
-    return update(storeName, Number(key), value);
+    return updateTable(storeName, Number(key), value);
   };
   updateData().then((data) => messageHandler(data));
 }
@@ -177,7 +120,7 @@ function deleteRecord(o) {
   var key = document.getElementById(storeName + "List").value;
 
   const removeData = async () => {
-    return remove(storeName, Number(key));
+    return removeFromTable(storeName, Number(key));
   };
   removeData().then((data) => messageHandler(data));
 }

@@ -13,21 +13,23 @@ function addOperator() {
   }
   const ctime = new Date().getTime();
 
-  const data = {
-    userName: document.getElementById("username").value,
-    userPassword: document.getElementById("password").value,
-    otherDetails: document.getElementById("other-details").value,
-    userRole: "operator",
-    passwordUpdatedOn: ctime,
-    isLogedIn: "n",
-    createdOn: ctime,
-    createdBy: 1,
-    updatedOn: ctime,
-    updatedBy: 1,
-  };
+  const data = [
+    {
+      userName: document.getElementById("username").value,
+      userPassword: document.getElementById("password").value,
+      otherDetails: document.getElementById("other-details").value,
+      userRole: "operator",
+      passwordUpdatedOn: ctime,
+      isLogedIn: "n",
+      createdOn: ctime,
+      createdBy: 1,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
   const fetchData = async () => {
-    return insert(data);
+    return insertInToTable("Operators", data, "results");
   };
   fetchData().then((data) => messageHandler(data));
 
@@ -49,14 +51,10 @@ function matchPassword() {
 
 function deletUser(d) {
   if (confirm("Are you sure, want to delete this record?")) {
-    let param = {
-      operation: "delete",
-      objstore: "Users",
-      index: "userName",
-      key: Number(d),
+    const removeData = async () => {
+      return removeFromTable("Operators", Number(d));
     };
-    let mydb = new idb(dbName, version);
-    mydb.openDB(param, messageHandler);
+    removeData().then((data) => messageHandler(data));
   }
 }
 
@@ -65,8 +63,8 @@ function messageHandler(m) {
     if (m.operation == "add") {
       document.getElementById("newOperatorForm").reset();
       populateOperatorDetailsTable(m.results);
-    } else if (m.operation == "delete") {
-      const element = document.getElementById("row-" + m.key);
+    } else if (m.operation == "remove") {
+      const element = document.getElementById("row-" + m.id);
       element.remove();
     } else if (m.operation == "edit") {
       document.getElementById("btnCloseEditModal").click();
@@ -87,18 +85,20 @@ function updateOperator() {
     return false;
   }
 
-  const data = {
-    userName: document.getElementById("updateUsername").value,
-    userPassword: pass,
-    otherDetails: document.getElementById("updateOtherDetails").value,
-    passwordUpdatedOn: ctime,
-    updatedOn: ctime,
-    updatedBy: 1,
-    id: Number(key),
-  };
+  const data = [
+    {
+      userName: document.getElementById("updateUsername").value,
+      userPassword: pass,
+      otherDetails: document.getElementById("updateOtherDetails").value,
+      passwordUpdatedOn: ctime,
+      updatedOn: ctime,
+      updatedBy: 1,
+      id: Number(key),
+    },
+  ];
 
   const updateData = async () => {
-    return update(data);
+    return updateTable("Operators", Number(key), data, "results");
   };
   updateData().then((data) => messageHandler(data));
   return false;
@@ -153,7 +153,7 @@ function populateOperatorDetailsTable(d) {
   html =
     html +
     '<i class="bi bi-trash" onclick="deletUser(' +
-    d.userId +
+    d.id +
     ');" style="cursor: pointer; margin-left:3px;"></i>';
   node = document.createElement("td");
   node.innerHTML = html;
@@ -165,47 +165,6 @@ function initOperatorTable(d) {
     const results = d.results;
     results.forEach(populateOperatorDetailsTable);
   }
-}
-
-async function selectAll(storeName) {
-  var results = await jsstoreCon.select({
-    from: storeName,
-  });
-
-  return { results: results, objstore: storeName };
-}
-
-async function insert(values) {
-  var insertedRecord = await jsstoreCon.insert({
-    into: "Operators",
-    values: [values],
-    return: true,
-  });
-
-  return {
-    status: "success",
-    objstore: "Operators",
-    message: `record inserted successfuly`,
-    results: insertedRecord[0],
-    operation: "add",
-  };
-}
-
-async function update(setValues) {
-  var rowsUpdated = await jsstoreCon.insert({
-    into: "Operators",
-    values: [setValues],
-    return: true,
-    upsert: true,
-  });
-
-  return {
-    status: "success",
-    objstore: "Operators",
-    message: `Record updated successfuly`,
-    operation: "edit",
-    results: rowsUpdated[0],
-  };
 }
 
 function prepareInt(d) {
