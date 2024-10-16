@@ -22,6 +22,8 @@ function getDbSchema(dbName) {
   var idProofsTable = idProofsSchema();
   var staffTable = staffSchema();
   var operatorsTable = operatorsSchema();
+  var visitorsTable = visitorSchema();
+  var visitesTable = visitesSchema();
 
   var db = {
     name: dbName,
@@ -33,6 +35,8 @@ function getDbSchema(dbName) {
       idProofsTable,
       staffTable,
       operatorsTable,
+      visitorsTable,
+      visitesTable,
     ],
   };
   return db;
@@ -293,6 +297,238 @@ function operatorsSchema() {
       },
       isLogedIn: {
         dataType: "string",
+      },
+      createdOn: {
+        dataType: "number",
+        default: new Date().getTime(),
+      },
+      createdBy: {
+        dataType: "number",
+        default: 1,
+      },
+      updatedOn: {
+        dataType: "number",
+        default: new Date().getTime(),
+      },
+      updatedBy: {
+        dataType: "number",
+        default: 1,
+      },
+    },
+  };
+
+  return table;
+}
+
+function visitorSchema() {
+  var table = {
+    name: "Visitors",
+    columns: {
+      visitorId: {
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      phonenumber: {
+        notNull: true,
+        dataType: "number",
+        unique: true,
+      },
+      iDProofId: {
+        notNull: true,
+        dataType: "number",
+      },
+      iDProof: {
+        dataType: "string",
+      },
+      iDNumber: {
+        notNull: true,
+        dataType: "string",
+      },
+      age: {
+        dataType: "number",
+      },
+      name: {
+        notNull: true,
+        dataType: "string",
+      },
+      category: {
+        notNull: true,
+        dataType: "string",
+      },
+      catId: {
+        notNull: true,
+        dataType: "number",
+      },
+      fname: {
+        dataType: "string",
+      },
+      organization: {
+        dataType: "string",
+      },
+      address: {
+        dataType: "string",
+      },
+      city: {
+        dataType: "string",
+      },
+      district: {
+        dataType: "string",
+      },
+      state: {
+        dataType: "string",
+      },
+      stateId: {
+        dataType: "number",
+      },
+      photo: {
+        dataType: "string",
+      },
+      isBlacklisted: {
+        dataType: "string",
+      },
+      isReturnedLastPass: {
+        dataType: "string",
+      },
+      totalVisites: {
+        dataType: "number",
+        default: 0,
+      },
+      createdOn: {
+        dataType: "number",
+        default: new Date().getTime(),
+      },
+      createdBy: {
+        dataType: "number",
+        default: 1,
+      },
+      updatedOn: {
+        dataType: "number",
+        default: new Date().getTime(),
+      },
+      updatedBy: {
+        dataType: "number",
+        default: 1,
+      },
+    },
+  };
+
+  return table;
+}
+
+function visitesSchema() {
+  var table = {
+    name: "Visites",
+    columns: {
+      visitesId: {
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      slipNumber: {
+        notNull: true,
+        dataType: "number",
+        unique: true,
+      },
+      department: {
+        notNull: true,
+        dataType: "string",
+      },
+      departmentId: {
+        notNull: true,
+        dataType: "number",
+      },
+      purpose: {
+        dataType: "string",
+      },
+      numperson: {
+        dataType: "number",
+      },
+      staffId: {
+        notNull: true,
+        dataType: "number",
+      },
+      designation: {
+        dataType: "string",
+      },
+      toMeet: {
+        dataType: "string",
+      },
+      visitingTime: {
+        notNull: true,
+        dataType: "number",
+      },
+      exitTime: {
+        dataType: "number",
+      },
+      visitPass: {
+        dataType: "string",
+      },
+      visitorId: {
+        notNull: true,
+        dataType: "number",
+      },
+      phonenumber: {
+        notNull: true,
+        dataType: "number",
+      },
+      iDProofId: {
+        notNull: true,
+        dataType: "number",
+      },
+      iDProof: {
+        dataType: "string",
+      },
+      iDNumber: {
+        notNull: true,
+        dataType: "string",
+      },
+      age: {
+        dataType: "number",
+      },
+      name: {
+        notNull: true,
+        dataType: "string",
+      },
+      category: {
+        notNull: true,
+        dataType: "string",
+      },
+      catId: {
+        notNull: true,
+        dataType: "number",
+      },
+      fname: {
+        dataType: "string",
+      },
+      organization: {
+        dataType: "string",
+      },
+      address: {
+        dataType: "string",
+      },
+      city: {
+        dataType: "string",
+      },
+      district: {
+        dataType: "string",
+      },
+      state: {
+        dataType: "string",
+      },
+      stateId: {
+        dataType: "number",
+      },
+      photo: {
+        dataType: "string",
+      },
+      isBlacklisted: {
+        dataType: "string",
+      },
+      isReturnedLastPass: {
+        dataType: "string",
+      },
+      totalVisites: {
+        dataType: "number",
+        default: 0,
       },
       createdOn: {
         dataType: "number",
