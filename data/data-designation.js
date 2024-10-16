@@ -1,4 +1,4 @@
-let designation = [
+let defaultDesignation = [
   {
     id: 1,
     name: "General Manager",
