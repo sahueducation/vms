@@ -1,5 +1,6 @@
 let dbName;
 let version;
+let jsstoreCon;
 let isBlacklisted = false;
 let isReturnedLastPass = false;
 
@@ -125,21 +126,15 @@ function getVisitorDetails(e) {
   $("#visitor-details")[0].reset();
   e.value = keyVal;
 
-  let param = {
-    operation: "getByIndex",
-    objstore: "Visitors",
-    index: "phonenumber",
-    key: keyVal,
+  const fetchingData = async () => {
+    return selectBy("Visitors", { phonenumber: Number(keyVal) });
   };
-  indb = new idb(dbName, version);
-  indb.openDB(param, handleVisitor);
+  fetchingData().then((r) => handleVisitor(r));
 }
 
 function handleVisitor(p) {
-  console.log(p);
-
-  if (!p.result) return true;
-  const data = p.result;
+  if (!p.results || p.results.length == 0) return true;
+  const data = p.results[0];
   document.getElementById("visitorId").value = data.visitorId;
   document.getElementById("IDProof").value = data.iDProofId;
   document.getElementById("id-number").value = data.iDNumber;
@@ -186,42 +181,45 @@ function saveVisitor() {
   let ctime = new Date().getTime();
 
   let visitorData = {
-    phonenumber: phonenumber,
-    iDProofId: iDProofId,
+    phonenumber: Number(phonenumber),
+    iDProofId: Number(iDProofId),
     iDProof: iDProof,
     iDNumber: iDNumber,
-    age: age,
+    age: Number(age),
     name: name,
     category: category,
-    catId: catId,
+    catId: Number(catId),
     fname: fname,
     organization: organization,
     address: address,
     city: city,
     district: district,
     state: state,
-    stateId: stateId,
+    stateId: Number(stateId),
     photo: "",
     isBlacklisted: "n",
     isReturnedLastPass: "n",
-    updatedDate: ctime,
+    updatedOn: ctime,
     updatedBy: 1,
   };
 
+  var returnType = "count";
+
   if (visitorId == "") {
-    visitorData.createdDate = ctime;
+    visitorData.createdOn = ctime;
     visitorData.createdBy = 1;
+    returnType = "results";
   }
 
-  let param = {
-    operation: "edit",
-    objstore: "Visitors",
-    index: "visitorId",
-    key: Number(visitorId),
-    data: visitorData,
+  const insertingData = async () => {
+    return updateTable(
+      "Visitors",
+      { visitorId: Number(visitorId) },
+      visitorData,
+      returnType
+    );
   };
-  indb = new idb(dbName, version);
-  indb.openDB(param, succ);
+  insertingData().then(() => succ());
 
   return false;
 }
@@ -233,7 +231,6 @@ function succ(d) {
 function saveVisitingDetails(s, f) {
   if (!validateForm(f)) return false;
 
-  //next(s, f);
   var visitorId = document.getElementById("visitorId").value;
   var phonenumber = document.getElementById("contactnumber").value;
   var IDProofCombo = document.getElementById("IDProof");
@@ -256,6 +253,51 @@ function saveVisitingDetails(s, f) {
   var photoObj = document.getElementById("canvas");
   var photo = photoObj.toDataURL("image/png");
 
+  let ctime = new Date().getTime();
+
+  let visitorData = {
+    phonenumber: Number(phonenumber),
+    iDProofId: Number(iDProofId),
+    iDProof: iDProof,
+    iDNumber: iDNumber,
+    age: Number(age),
+    name: name,
+    category: category,
+    catId: Number(catId),
+    fname: fname,
+    organization: organization,
+    address: address,
+    city: city,
+    district: district,
+    state: state,
+    stateId: Number(stateId),
+    photo: photo,
+    isBlacklisted: "n",
+    isReturnedLastPass: "n",
+    updatedOn: ctime,
+    updatedBy: 1,
+  };
+
+  const insertingData = async () => {
+    if (visitorId == "") {
+      visitorData.createdOn = ctime;
+      visitorData.createdBy = 1;
+    } else {
+      visitorData.visitorId = Number(visitorId);
+    }
+    return updateTable(
+      "Visitors",
+      { visitorId: Number(visitorId) },
+      visitorData,
+      "results"
+    );
+  };
+  insertingData().then((d) => updateVisitesDetail(d));
+
+  return false;
+}
+
+function updateVisitesDetail(d) {
   var departmentCombo = document.getElementById("Departments");
   var department = departmentCombo.options[departmentCombo.selectedIndex].text;
   var departmentid = departmentCombo.value;
@@ -266,96 +308,81 @@ function saveVisitingDetails(s, f) {
   var designation = document.getElementById("staffDesignation").value;
 
   let ctime = new Date().getTime();
-
-  let visitorData = {
-    visitorId: Number(visitorId),
-    phonenumber: phonenumber,
-    iDProofId: iDProofId,
-    iDProof: iDProof,
-    iDNumber: iDNumber,
-    age: age,
-    name: name,
-    category: category,
-    catId: catId,
-    fname: fname,
-    organization: organization,
-    address: address,
-    city: city,
-    district: district,
-    state: state,
-    stateId: stateId,
-    photo: photo,
-    totalVisites: 1,
-    isBlacklisted: "n",
-    isReturnedLastPass: "n",
-    updatedDate: ctime,
-    updatedBy: 1,
-  };
+  let totalVisistes = d.results.totalVisites;
+  console.log(totalVisistes);
 
   let visitingData = {
     slipNumber: ctime,
     department: department,
-    departmentId: departmentid,
+    departmentId: Number(departmentid),
     purpose: purpose,
-    numperson: numperson,
-    staffId: staffid,
+    numperson: Number(numperson),
+    staffId: Number(staffid),
     designation: designation,
     toMeet: toMeet,
     visitingTime: ctime,
-    exitTime: "",
     visitPass: "Issued",
+    age: d.results.age,
+    visitorId: d.results.visitorId,
+    iDProofId: d.results.iDProofId,
+    fname: d.results.fname,
+    photo: d.results.photo,
+    name: d.results.name,
+    state: d.results.state,
+    city: d.results.city,
+    district: d.results.district,
+    category: d.results.category,
+    catId: d.results.catId,
+    stateId: d.results.stateId,
+    iDProof: d.results.iDProof,
+    address: d.results.address,
+    phonenumber: d.results.phonenumber,
+    iDNumber: d.results.iDNumber,
+    isBlacklisted: d.results.isBlacklisted,
+    organization: d.results.organization,
+    isReturnedLastPass: d.results.isReturnedLastPass,
+    totalVisites: Number(d.results.totalVisites) + 1,
   };
-
-  if (visitorId == "") {
-    visitorData.createdDate = ctime;
-    visitorData.createdBy = 1;
-  }
-
-  let param = {
-    operation: "createVisites",
-    mode: "draft",
-    visitorData: visitorData,
-    visitesData: visitingData,
-    extraData: { nextStep: s },
+  const insertingData = async () => {
+    return insertInToTable("Visites", visitingData, "results");
   };
-  indb = new idb(dbName, version);
-  indb.openDB(param, messageHandler);
+  insertingData().then((d) => messageHandler(d));
 
-  return false;
+  updateTable(
+    "Visitors",
+    { visitorId: d.results.visitorId },
+    { totalVisites: Number(d.results.totalVisites) + 1 }
+  );
 }
 
 function messageHandler(d) {
-  if (d.operation == "createVisites" && d.status == "success") {
-    let dateTime = formatedTime(d.visitesData.visitingTime);
-    document.getElementById("printSlipNo").innerText = d.visitesData.slipNumber;
-    document.getElementById("printVisitorCat").innerText =
-      d.visitesData.category;
-    document.getElementById("printVisitorImg").src = d.visitesData.photo;
+  if (d.operation == "add" && d.status == "success") {
+    let dateTime = formatedTime(d.results.visitingTime);
+    document.getElementById("printSlipNo").innerText = d.results.slipNumber;
+    document.getElementById("printVisitorCat").innerText = d.results.category;
+    document.getElementById("printVisitorImg").src = d.results.photo;
     document.getElementById("printVisitingDate").innerText = dateTime.date;
     document.getElementById("printVisitingTime").innerText = dateTime.time;
-    document.getElementById("printVisitorName").innerText = d.visitesData.name;
-    document.getElementById("printVisitorAge").innerText = d.visitesData.age;
+    document.getElementById("printVisitorName").innerText = d.results.name;
+    document.getElementById("printVisitorAge").innerText = d.results.age;
     document.getElementById("printVisitorPhone").innerText =
-      d.visitesData.phonenumber;
-    document.getElementById("printVisitorFname").innerText =
-      d.visitesData.fname;
+      d.results.phonenumber;
+    document.getElementById("printVisitorFname").innerText = d.results.fname;
     document.getElementById("printVisitorAddress").innerText =
-      d.visitesData.address;
-    document.getElementById("printVisitorCity").innerText = d.visitesData.city;
-    document.getElementById("printVisitorState").innerText =
-      d.visitesData.state;
+      d.results.address;
+    document.getElementById("printVisitorCity").innerText = d.results.city;
+    document.getElementById("printVisitorState").innerText = d.results.state;
     document.getElementById("printVisitorDistrict").innerText =
-      d.visitesData.district;
-    document.getElementById("printVisitorToMeet").innerText =
-      d.visitesData.toMeet;
+      d.results.district;
+    document.getElementById("printVisitorToMeet").innerText = d.results.toMeet;
     document.getElementById("printVisitorToMeetSec").innerText =
-      d.visitesData.department;
+      d.results.department;
     document.getElementById("printVisitorPurpose").innerText =
-      d.visitesData.purpose;
+      d.results.purpose;
     document.getElementById("printVisitorNoPerson").innerText =
-      d.visitesData.numperson;
+      d.results.numperson;
 
-    next(d.extraData.nextStep);
+    next(2);
   }
 }
 
@@ -398,14 +425,10 @@ function selectWantedToMeet(e) {
 }
 
 function getWantedToMeet(v) {
-  let param = {
-    operation: "getAllByIndex",
-    objstore: "StaffDetails",
-    index: "depId",
-    key: v,
+  const fetchingData = async () => {
+    return selectBy("StaffDetails", { staffId: Number(v) });
   };
-  indb = new idb(dbName, version);
-  indb.openDB(param, populateWatantedToMeet);
+  fetchingData().then((r) => populateWatantedToMeet(r));
 }
 
 function populateWatantedToMeet(d) {
@@ -440,7 +463,7 @@ function populateWatantedToMeet(d) {
 }
 
 function populateComboField(d) {
-  const eId = d.param.objstore;
+  const eId = d.objstore;
   const data = d.results;
   //console.log(data);
   var sel = document.getElementById(eId);
@@ -466,41 +489,29 @@ function populateHeaderContent(d) {
   document.getElementById("footerText").innerHTML = d.contents.footer;
 }
 
+function fetchMasterData(table) {
+  const fetchData = async () => {
+    return selectAll(table);
+  };
+  fetchData().then((data) => populateComboField(data));
+}
+
 function prepareInt(d) {
   dbName = d.database.dbName;
   version = d.database.version;
 
+  initDb();
   //Retriving all Visitor Category
-  let idProofDb = new idb(dbName, version);
-  let idProofParam = {
-    operation: "getAll",
-    objstore: "IDProof",
-    index: "name",
-  };
-  idProofDb.openDB(idProofParam, populateComboField);
+  fetchMasterData("IDProof");
 
   //Retriving all Visitor Category
-  let catDb = new idb(dbName, version);
-  let catParam = {
-    operation: "getAll",
-    objstore: "VisitorCategory",
-    index: "name",
-  };
-  catDb.openDB(catParam, populateComboField);
+  fetchMasterData("VisitorCategory");
 
   //Retriving all States Names
-  let stateDb = new idb(dbName, version);
-  let stateParam = { operation: "getAll", objstore: "States", index: "name" };
-  stateDb.openDB(stateParam, populateComboField);
+  fetchMasterData("States");
 
   //Retriving all Department Names
-  let depdb = new idb(dbName, version);
-  let depParam = {
-    operation: "getAll",
-    objstore: "Departments",
-    index: "name",
-  };
-  depdb.openDB(depParam, populateComboField);
+  fetchMasterData("Departments");
 
   //Populate Header Contents
   populateHeaderContent(d);

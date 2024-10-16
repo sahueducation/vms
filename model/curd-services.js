@@ -6,8 +6,21 @@ async function selectAll(table) {
   return { results: results, objstore: table };
 }
 
+async function selectBy(table, whereCluse = {}) {
+  let obj = { from: table };
+  obj.where = whereCluse;
+
+  var results = await jsstoreCon.select(obj);
+
+  return { results: results, objstore: table };
+}
+
 async function insertInToTable(table, values, returnType = "count") {
   let returnValue = {};
+  if (!Array.isArray(values)) {
+    values = [values];
+  }
+
   if (returnType == "count") {
     var insertCount = await jsstoreCon.insert({
       into: table,
@@ -36,23 +49,33 @@ async function insertInToTable(table, values, returnType = "count") {
   return returnValue;
 }
 
-async function updateTable(table, id = 0, value, returnType = "count") {
+async function updateTable(table, whereAtt, value, returnType = "count") {
   let returnValue = {};
+  let obj = {};
   if (returnType == "count") {
-    var rowsUpdated = await jsstoreCon.update({
-      in: table,
-      where: {
-        id: id,
-      },
-      set: {
-        name: value,
-      },
-    });
+    obj.in = table;
+
+    if (typeof whereAtt === "object") {
+      obj.where = whereAtt;
+    } else {
+      obj.where = { id: whereAtt };
+    }
+
+    if (typeof value === "object") {
+      obj.set = value;
+    } else {
+      obj.set = { name: value };
+    }
+
+    var rowsUpdated = await jsstoreCon.update(obj);
 
     returnValue = {
       message: `${rowsUpdated} record updated successfuly`,
     };
   } else if (returnType == "results") {
+    if (!Array.isArray(value)) {
+      value = [value];
+    }
     var rowsUpdated = await jsstoreCon.insert({
       into: table,
       values: value,

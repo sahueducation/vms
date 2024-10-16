@@ -29,3 +29,30 @@ let operatorsDumyData = [
     otherDetails: "This is default Operator",
   },
 ];
+
+let visitorDumyData = [
+  {
+    address: "LakeViewComplex, Dhakoli",
+    age: "47",
+    catId: "1",
+    category: "General Public",
+    city: "Zirakpur",
+    createdBy: 1,
+    createdOn: 1729059724682,
+    district: "Mohali",
+    fname: "B D Sahu",
+    iDNumber: "111122223333",
+    iDProof: "Aadhar Card",
+    iDProofId: "1",
+    isBlacklisted: "n",
+    isReturnedLastPass: "n",
+    name: "A K Sahu",
+    organization: "Bellway",
+    phonenumber: "1122334455",
+    photo: "",
+    state: "Punjab",
+    stateId: "28",
+    updatedBy: 1,
+    updatedOn: 1729059724682,
+  },
+];
