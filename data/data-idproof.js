@@ -1,4 +1,4 @@
-let idProofs = [
+let defaultIdProofs = [
   {
     id: 1,
     name: "Aadhar Card",

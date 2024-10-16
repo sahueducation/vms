@@ -1,4 +1,4 @@
-let categories = [
+let defaultCategories = [
   {
     id: 1,
     name: "General Public",

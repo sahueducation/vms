@@ -1,4 +1,4 @@
-let departments = [
+let defaultDepartments = [
   {
     id: 1,
     name: "IT",

@@ -19,19 +19,25 @@ function importData() {
   initiatingDb().then((data) => msgHandler(data));
 
   //Inserting States data ...
-  insertingDataInToTable("States", states);
+  insertingDataInToTable("States", defaultStates);
 
   //Inserting Departments data ...
-  insertingDataInToTable("Departments", departments);
+  insertingDataInToTable("Departments", defaultDepartments);
 
   //Inserting Categories data ...
-  insertingDataInToTable("VisitorCategory", categories);
+  insertingDataInToTable("VisitorCategory", defaultCategories);
 
   //Inserting Designation data ...
-  insertingDataInToTable("Designation", designation);
+  insertingDataInToTable("Designation", defaultDesignation);
 
   //Inserting Idproofs data ...
-  insertingDataInToTable("IDProof", idProofs);
+  insertingDataInToTable("IDProof", defaultIdProofs);
+
+  //Inserting Staff data ...
+  insertingDataInToTable("StaffDetails", staffsDumyData);
+
+  //Inserting Operators data ...
+  insertingDataInToTable("Operators", operatorsDumyData);
 }
 
 function insertingDataInToTable(table, value) {
