@@ -49,10 +49,10 @@ async function insertInToTable(table, values, returnType = "count") {
   return returnValue;
 }
 
-async function updateTable(table, whereAtt, value, returnType = "count") {
+async function updateTable(table, whereAtt, value, updateType = "update") {
   let returnValue = {};
   let obj = {};
-  if (returnType == "count") {
+  if (updateType == "update") {
     obj.in = table;
 
     if (typeof whereAtt === "object") {
@@ -71,8 +71,9 @@ async function updateTable(table, whereAtt, value, returnType = "count") {
 
     returnValue = {
       message: `${rowsUpdated} record updated successfuly`,
+      results: Object.assign({}, obj.set, obj.where),
     };
-  } else if (returnType == "results") {
+  } else if (updateType == "results") {
     if (!Array.isArray(value)) {
       value = [value];
     }
