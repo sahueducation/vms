@@ -228,7 +228,7 @@ function succ(d) {
   showModal();
 }
 
-function saveVisitingDetails(s, f) {
+async function saveVisitingDetails(s, f) {
   if (!validateForm(f)) return false;
 
   var visitorId = document.getElementById("visitorId").value;
@@ -278,13 +278,19 @@ function saveVisitingDetails(s, f) {
     updatedBy: 1,
   };
 
+  if (visitorId == "") {
+    visitorData.createdOn = ctime;
+    visitorData.createdBy = 1;
+    visitorData.totalVisites = 1;
+    updateType = "upsert";
+  } else {
+    visitorData.visitorId = Number(visitorId);
+    var totalVisistes = await getTotalVisites(visitorId);
+    visitorData.totalVisites = totalVisistes + 1;
+    updateType = "update";
+  }
+
   const insertingData = async () => {
-    if (visitorId == "") {
-      visitorData.createdOn = ctime;
-      visitorData.createdBy = 1;
-    } else {
-      visitorData.visitorId = Number(visitorId);
-    }
     return updateTable(
       "Visitors",
       { visitorId: Number(visitorId) },
@@ -295,6 +301,11 @@ function saveVisitingDetails(s, f) {
   insertingData().then((d) => updateVisitesDetail(d));
 
   return false;
+}
+
+async function getTotalVisites(id) {
+  var visitor = await selectBy("Visitors", { visitorId: Number(id) });
+  return visitor["results"][0].totalVisites;
 }
 
 function updateVisitesDetail(d) {
@@ -308,8 +319,6 @@ function updateVisitesDetail(d) {
   var designation = document.getElementById("staffDesignation").value;
 
   let ctime = new Date().getTime();
-  let totalVisistes = d.results.totalVisites;
-  console.log(totalVisistes);
 
   let visitingData = {
     slipNumber: ctime,
@@ -341,18 +350,13 @@ function updateVisitesDetail(d) {
     isBlacklisted: d.results.isBlacklisted,
     organization: d.results.organization,
     isReturnedLastPass: d.results.isReturnedLastPass,
-    totalVisites: Number(d.results.totalVisites) + 1,
+    totalVisites: d.results.totalVisites,
   };
+
   const insertingData = async () => {
     return insertInToTable("Visites", visitingData, "results");
   };
   insertingData().then((d) => messageHandler(d));
-
-  updateTable(
-    "Visitors",
-    { visitorId: d.results.visitorId },
-    { totalVisites: Number(d.results.totalVisites) + 1 }
-  );
 }
 
 function messageHandler(d) {
