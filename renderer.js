@@ -155,6 +155,15 @@ function prepareInt(d) {
   mydb.openDB(countTodayParam, populateCounts);
   prepareVisitorChart();
   populateReportChart();
+
+  //domy data
+  var data = [
+    { name: "IT", value: 20 },
+    { name: "Accounts", value: 12 },
+    { name: "Civil", value: 23 },
+    { name: "Sales", value: 9 },
+  ];
+  populateVisitorChart(data);
 }
 
 function populateVisitorChart(data) {

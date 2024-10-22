@@ -19,7 +19,7 @@ const createWindow = (fName) => {
   mainWindow.loadFile(fName);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
 
 ipcMain.on("set-user-credentials", (event, status) => {
@@ -109,7 +109,7 @@ ipcMain.on("set-reports", (event, data) => {
   });
 
   let wc = child.webContents;
-  wc.openDevTools({ mode: "undocked" });
+  //wc.openDevTools({ mode: "undocked" });
   wc.send("report-type", data);
 });
 
