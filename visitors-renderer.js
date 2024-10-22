@@ -58,7 +58,7 @@ function markAsBlacklisted(e) {
     operation: "getByIndex",
     objstore: "Visitors",
     index: "phonenumber",
-    key: String(phonenumber),
+    key: Number(phonenumber),
     visitesId: dataObj.visitesId,
   };
   visitesDb.openDB(visitesParam, handleBlacklisted);

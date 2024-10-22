@@ -133,7 +133,10 @@ function getVisitorDetails(e) {
 }
 
 function handleVisitor(p) {
-  if (!p.results || p.results.length == 0) return true;
+  if (!p.results || p.results.length == 0) {
+    isBlacklisted = false;
+    return true;
+  }
   const data = p.results[0];
   document.getElementById("visitorId").value = data.visitorId;
   document.getElementById("IDProof").value = data.iDProofId;
