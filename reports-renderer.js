@@ -1,5 +1,3 @@
-let G_dbName;
-let G_version;
 let G_data = [];
 let G_reportType;
 let G_currentPage = 1;

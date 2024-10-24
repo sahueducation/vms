@@ -110,7 +110,7 @@ ipcMain.on("set-reports", (event, data) => {
   });
 
   let wc = child.webContents;
-  //wc.openDevTools({ mode: "undocked" });
+  wc.openDevTools({ mode: "undocked" });
   wc.send("report-type", data);
 });
 

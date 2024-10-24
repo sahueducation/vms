@@ -1,6 +1,3 @@
-let dbName;
-let version;
-let jsstoreCon;
 let isBlacklisted = false;
 let isReturnedLastPass = false;
 
@@ -514,8 +511,8 @@ function populateVisitorDetails() {
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
 
   initDb();
   //Retriving all Visitor Category

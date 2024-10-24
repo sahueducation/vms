@@ -1,5 +1,5 @@
 async function selectAll(table) {
-  var results = await jsstoreCon.select({
+  var results = await G_jsstoreCon.select({
     from: table,
   });
 
@@ -10,13 +10,13 @@ async function selectBy(table, whereCluse = {}) {
   let obj = { from: table };
   obj.where = whereCluse;
 
-  var results = await jsstoreCon.select(obj);
+  var results = await G_jsstoreCon.select(obj);
 
   return { results: results, objstore: table };
 }
 
 async function selectByCluse(selectCluses = {}) {
-  var results = await jsstoreCon.select(selectCluses);
+  var results = await G_jsstoreCon.select(selectCluses);
 
   return { results: results, objstore: selectCluses.from };
 }
@@ -28,7 +28,7 @@ async function insertInToTable(table, values, returnType = "count") {
   }
 
   if (returnType == "count") {
-    var insertCount = await jsstoreCon.insert({
+    var insertCount = await G_jsstoreCon.insert({
       into: table,
       values: values,
     });
@@ -37,7 +37,7 @@ async function insertInToTable(table, values, returnType = "count") {
       message: `${insertCount} rows inserted in ${table} table`,
     };
   } else if (returnType == "results") {
-    var insertedRecord = await jsstoreCon.insert({
+    var insertedRecord = await G_jsstoreCon.insert({
       into: table,
       values: values,
       return: true,
@@ -73,7 +73,7 @@ async function updateTable(table, whereAtt, value, updateType = "update") {
       obj.set = { name: value };
     }
 
-    var rowsUpdated = await jsstoreCon.update(obj);
+    var rowsUpdated = await G_jsstoreCon.update(obj);
 
     returnValue = {
       message: `${rowsUpdated} record updated successfuly`,
@@ -83,7 +83,7 @@ async function updateTable(table, whereAtt, value, updateType = "update") {
     if (!Array.isArray(value)) {
       value = [value];
     }
-    var rowsUpdated = await jsstoreCon.insert({
+    var rowsUpdated = await G_jsstoreCon.insert({
       into: table,
       values: value,
       return: true,
@@ -103,7 +103,7 @@ async function updateTable(table, whereAtt, value, updateType = "update") {
 }
 
 async function updateByCluse(updateCluse = {}) {
-  var results = await jsstoreCon.update(updateCluse);
+  var results = await G_jsstoreCon.update(updateCluse);
 
   return { status: "success", results: results, updateCluse: updateCluse };
 }
@@ -119,7 +119,7 @@ async function removeFromTable(table, id, customWhereCluse = {}) {
     obj.where = customWhereCluse;
   }
 
-  var rowsDeleted = await jsstoreCon.remove(obj);
+  var rowsDeleted = await G_jsstoreCon.remove(obj);
 
   return {
     status: "success",
@@ -131,7 +131,7 @@ async function removeFromTable(table, id, customWhereCluse = {}) {
 }
 
 async function removeByCluse(removeCluses = {}) {
-  var results = await jsstoreCon.remove(removeCluses);
+  var results = await G_jsstoreCon.remove(removeCluses);
 
   return { results: results, removeCluses: removeCluses };
 }

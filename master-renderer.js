@@ -1,8 +1,5 @@
-let dbName;
-let version;
 let footerContain;
 let headerContain;
-let jsstoreCon;
 
 document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
@@ -133,8 +130,8 @@ function fetchMasterData(table) {
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
 
   initDb();
   //Retriving all States Names
