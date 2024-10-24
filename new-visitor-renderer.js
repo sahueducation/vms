@@ -139,6 +139,7 @@ function handleVisitor(p) {
   }
   const data = p.results[0];
   document.getElementById("visitorId").value = data.visitorId;
+  document.getElementById("contactnumber").value = data.phonenumber;
   document.getElementById("IDProof").value = data.iDProofId;
   document.getElementById("id-number").value = data.iDNumber;
   document.getElementById("VisitorCategory").value = data.catId;
@@ -491,7 +492,6 @@ function populateComboField(d) {
 }
 
 function populateHeaderContent(d) {
-  //console.log(d);
   document.getElementById("headerText").innerHTML = d.contents.header;
   document.getElementById("footerText").innerHTML = d.contents.footer;
 }
@@ -501,6 +501,16 @@ function fetchMasterData(table) {
     return selectAll(table);
   };
   fetchData().then((data) => populateComboField(data));
+}
+
+function populateVisitorDetails() {
+  val = $("#visitorId").val();
+  console.log(val);
+
+  const fetchingData = async () => {
+    return selectBy("Visitors", { visitorId: Number(val) });
+  };
+  fetchingData().then((r) => handleVisitor(r));
 }
 
 function prepareInt(d) {
@@ -519,6 +529,9 @@ function prepareInt(d) {
 
   //Retriving all Department Names
   fetchMasterData("Departments");
+
+  //Populate Visitor Deatils
+  populateVisitorDetails();
 
   //Populate Header Contents
   populateHeaderContent(d);

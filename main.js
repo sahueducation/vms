@@ -36,28 +36,29 @@ ipcMain.on("set-user-credentials", (event, status) => {
   }
 });
 
-ipcMain.on("set-new-visitor", (event, data) => {
-  if (data == "y") {
-    const webContents = event.sender;
-    const pWin = BrowserWindow.fromWebContents(webContents);
-    const child = new BrowserWindow({
-      parent: pWin,
-      modal: true,
-      show: false,
-      width: 1100,
-      height: 800,
-      webPreferences: {
-        preload: path.join(__dirname, "new-visitor-preload.js"),
-      },
-    });
-    child.loadFile("new-visitor.html");
-    child.once("ready-to-show", () => {
-      child.show();
-    });
+ipcMain.on("set-new-visitor", (event, value) => {
+  const webContents = event.sender;
+  const pWin = BrowserWindow.fromWebContents(webContents);
+  const child = new BrowserWindow({
+    parent: pWin,
+    modal: true,
+    show: false,
+    width: 1100,
+    height: 800,
+    webPreferences: {
+      preload: path.join(__dirname, "new-visitor-preload.js"),
+    },
+  });
+  child.loadFile("new-visitor.html");
+  child.once("ready-to-show", () => {
+    child.show();
+  });
 
-    let wc = child.webContents;
-    wc.openDevTools({ mode: "undocked" });
+  let wc = child.webContents;
+  if (value != "y") {
+    wc.send("visiter_phone", value);
   }
+  wc.openDevTools({ mode: "undocked" });
 });
 
 ipcMain.on("set-conf", (event, data) => {

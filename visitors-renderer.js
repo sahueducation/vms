@@ -1,10 +1,65 @@
 let dbName;
 let version;
+let jsstoreCon;
 
 document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.quiteWindow("y");
 });
+
+function openNewVistorWindow(v) {
+  window.electronAPI.setNewVisitor(v);
+}
+
+function deleteVisite(v) {
+  if (confirm("Are you sure, want to delete this record?")) {
+    const removedRecord = async () => {
+      return removeByCluse({
+        from: "Visites",
+        where: {
+          visitesId: Number(v),
+        },
+      });
+    };
+    removedRecord().then((data) => handleRemoveLineItem(data));
+  }
+}
+
+function handleRemoveLineItem(v) {
+  let rowId = "#row-" + v.removeCluses.where.visitesId;
+  $(rowId).hide();
+}
+
+function viewVisiteDetails(e) {
+  let data = $(e).parents("tr").data("data");
+
+  $("#printSlipNo").html(data.slipNumber);
+  $("#printVisitorCat").html(data.category);
+  $("#printVisitorImg").attr("src", data.photo);
+  $("#printVisitingDate").html(formatedTime(data.visitingTime).date);
+  $("#printVisitingTime").html(formatedTime(data.visitingTime).time);
+
+  $("#printVisitorName").html("<b>" + data.name + "</b>");
+  $("#printVisitorAge").html(data.age);
+  $("#printVisitorPhone").html(data.phonenumber);
+  $("#printVisitorPhone").html(data.phonenumber);
+  $("#printVisitorFname").html(data.fname);
+  $("#printVisitorAddress").html(data.address);
+  $("#printVisitorCity").html(data.city);
+  $("#printVisitorState").html(data.state);
+  $("#printVisitorDistrict").html(data.district);
+
+  $("#printVisitorToMeet").html(data.toMeet);
+  $("#printVisitorToMeetSec").html(data.department);
+  $("#printVisitorPurpose").html(data.purpose);
+  $("#printVisitorNoPerson").html(data.numperson);
+
+  $("#headerText").hide();
+  $("#footerText").hide();
+  $("#btnPrint").hide();
+
+  $("#ExtralargeModal").modal("show");
+}
 
 function printPage() {
   window.print();
@@ -14,84 +69,91 @@ function markPassReturned(e) {
   let dataObj = $(e).parents("tr").data("data");
 
   let visitesId = dataObj.visitesId;
+  let visitorId = dataObj.visitorId;
+  let visitesTime = new Date().getTime();
+  let timeConsumed = visitesTime - dataObj.visitingTime;
 
-  const data = { isReturnedLastPass: "y", visitPass: "Returned" };
-  let visitesDb = new idb(dbName, version);
-  let visitesParam = {
-    operation: "edit",
-    objstore: "Visites",
-    key: Number(visitesId),
-    data: data,
+  const data = {
+    isReturnedLastPass: "y",
+    visitPass: "Returned",
+    passReturnedTime: visitesTime,
+    timeConsumed: timeConsumed,
   };
-  visitesDb.openDB(visitesParam, handlePassReturned);
+
+  const updateRecord = async () => {
+    updateByCluse({
+      in: "Visitors",
+      where: {
+        visitorId: Number(visitorId),
+      },
+      set: { isReturnedLastPass: "y" },
+    });
+
+    return updateByCluse({
+      in: "Visites",
+      where: {
+        visitesId: Number(visitesId),
+      },
+      set: data,
+    });
+  };
+  updateRecord().then((data) => handlePassReturned(data));
 }
 
 function handlePassReturned(d) {
-  if (d.status == "success" && d.param.objstore == "Visites") {
-    let tds = $("#row-" + d.param.key).children("td");
-    let span = $(tds[4]).find("span");
-    $(span[0])
-      .removeClass("bg-primary")
-      .addClass("bg-success")
-      .text(d.param.data.visitPass);
-    const data = { isReturnedLastPass: "y" };
-    let visitesDb = new idb(dbName, version);
-    let visitesParam = {
-      operation: "edit",
-      objstore: "Visitors",
-      key: Number(d.param.data.visitorId),
-      data: data,
-    };
-    visitesDb.openDB(visitesParam, handlePassReturned);
-  } else if (d.status == "success" && d.param.objstore == "Visitors") {
-    alert(d.message);
-  }
+  let tds = $("#row-" + d.updateCluse.where.visitesId).children("td");
+  let span = $(tds[4]).find("span");
+  $(span[0])
+    .removeClass("bg-primary")
+    .addClass("bg-success")
+    .text(d.updateCluse.set.visitPass);
 }
 
 function markAsBlacklisted(e) {
   let dataObj = $(e).parents("tr").data("data");
-  console.log(dataObj);
-  let phonenumber = $(e).data("phonenumber");
 
-  let visitesDb = new idb(dbName, version);
-  let visitesParam = {
-    operation: "getByIndex",
-    objstore: "Visitors",
-    index: "phonenumber",
-    key: Number(phonenumber),
-    visitesId: dataObj.visitesId,
+  let blackListedVal = dataObj.isBlacklisted;
+  if (blackListedVal == "n") {
+    blackListedVal = "y";
+  } else {
+    blackListedVal = "n";
+  }
+  let visitesId = dataObj.visitesId;
+  let visitorId = dataObj.visitorId;
+
+  const updateRecord = async () => {
+    updateByCluse({
+      in: "Visitors",
+      where: {
+        visitorId: Number(visitorId),
+      },
+      set: { isBlacklisted: blackListedVal },
+    });
+
+    return updateByCluse({
+      in: "Visites",
+      where: {
+        visitesId: Number(visitesId),
+      },
+      set: { isBlacklisted: blackListedVal },
+    });
   };
-  visitesDb.openDB(visitesParam, handleBlacklisted);
+  updateRecord().then((data) => handleBlacklisted(data));
 }
 
 function handleBlacklisted(d) {
-  console.log(d);
+  let dataObj = $("#row-" + d.updateCluse.where.visitesId).data("data");
+  dataObj.isBlacklisted = d.updateCluse.set.isBlacklisted;
+  $("#row-" + d.updateCluse.where.visitesId).data("data", dataObj);
 
-  if (d.status == "success" && d.param.operation == "getByIndex") {
-    if (!d.result) return false;
-    let blackListed = "y";
-    if (d.result.isBlacklisted == "y") {
-      blackListed = "n";
-    }
-
-    const data = { isBlacklisted: blackListed };
-    let visitesDb = new idb(dbName, version);
-    let visitesParam = {
-      operation: "edit",
-      objstore: "Visitors",
-      key: Number(d.result.visitorId),
-      data: data,
-      visitesId: d.param.visitesId,
-    };
-    visitesDb.openDB(visitesParam, handleBlacklisted);
-  } else if (d.status == "success" && d.param.operation == "edit") {
-    alert(d.message);
-    if (d.param.data.isBlacklisted == "y") {
-      $("#row-" + d.param.visitesId).addClass("table-danger");
-    } else {
-      $("#row-" + d.param.visitesId).removeClass("table-danger");
-    }
+  if (d.updateCluse.set.isBlacklisted == "y") {
+    $("#row-" + d.updateCluse.where.visitesId).addClass("table-danger");
+  } else {
+    $("#row-" + d.updateCluse.where.visitesId).removeClass("table-danger");
   }
+  alert("Marked successfuly.");
+
+  return false;
 }
 
 function formatedTime(d) {
@@ -112,8 +174,7 @@ function formatedTime(d) {
 
 function printPreview(e) {
   let data = $(e).parents("tr").data("data");
-  //const data = $("#" + rowid).data("data");
-  //console.log(data);
+
   $("#printSlipNo").html(data.slipNumber);
   $("#printVisitorCat").html(data.category);
   $("#printVisitorImg").attr("src", data.photo);
@@ -187,69 +248,28 @@ function PopulateRow(d) {
   //<span class="badge bg-warning text-dark">On Hold</span>
   row.appendChild(node);
 
-  /*
-  <i
-                          class="bi bi-pencil-square me-1"
-                          style="cursor: pointer"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-original-title="Edit"
-                        ></i>
-                        <i
-                          class="bi bi-trash me-1"
-                          style="cursor: pointer"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-original-title="Delete"
-                        ></i>
-                        <i
-                          class="bi bi-printer me-1"
-                          style="cursor: pointer"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-original-title="Print Visiting Slip"
-                        ></i>
-                        <i
-                          class="bi bi-eye me-1"
-                          style="cursor: pointer"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-original-title="View Details"
-                        ></i>
-                        <i
-                          class="bi bi-bootstrap-reboot me-1"
-                          style="cursor: pointer; color: darkgoldenrod"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-original-title="Toggle Return Visiting Pass"
-                        ></i>
-                        <i
-                          class="bi bi-exclamation-octagon"
-                          style="
-                            cursor: pointer;
-                            margin-left: 3px;
-                            color: crimson;
-                          "
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-original-title="Black List Visiter"
-                        ></i>
-  */
-
   let html = "";
-  /*
+
   html = html + '<i class="bi bi-pencil-square me-1" ';
   html = html + 'style="cursor: pointer" ';
   html = html + 'data-bs-toggle="tooltip" ';
-  html = html + 'data-bs-placement="top" ';
+  html =
+    html +
+    'data-bs-placement="top" onClick="openNewVistorWindow(' +
+    d.visitorId +
+    ')" ';
   html = html + 'data-bs-original-title="Edit"></i>';
 
   html = html + '<i class="bi bi-trash me-1" ';
   html = html + 'style="cursor: pointer" ';
   html = html + 'data-bs-toggle="tooltip" ';
-  html = html + 'data-bs-placement="top" ';
+  html =
+    html +
+    'data-bs-placement="top" onClick="deleteVisite(' +
+    d.visitesId +
+    ')" ';
   html = html + 'data-bs-original-title="Delete"></i>';
-*/
+
   html = html + '<a href="#" ';
   html = html + 'onclick="printPreview(this);"> ';
   html = html + '<i class="bi bi-printer me-1" ';
@@ -260,7 +280,7 @@ function PopulateRow(d) {
   html = html + '<i class="bi bi-eye me-1" ';
   html = html + 'style="cursor: pointer" ';
   html = html + 'data-bs-toggle="tooltip" ';
-  html = html + 'data-bs-placement="top" ';
+  html = html + 'data-bs-placement="top" onClick="viewVisiteDetails(this)" ';
   html = html + 'data-bs-original-title="View Details"></i>';
 
   html = html + '<i class="bi bi-bootstrap-reboot me-1" ';
@@ -296,19 +316,35 @@ function populatePrintHeaderFooter(c) {
   $("#footerText").html(c.footer);
 }
 
+function fetchVisitesData() {
+  const fetchData = async () => {
+    let dateObj = new Date();
+    dateObj.setDate(dateObj.getDate() - 7);
+    let sinceYesterday = dateObj.getTime();
+    return selectByCluse({
+      from: "Visites",
+      where: {
+        visitingTime: {
+          ">": sinceYesterday,
+        },
+      },
+      order: {
+        by: "visitingTime",
+        type: "desc",
+      },
+    });
+  };
+  fetchData().then((data) => initPopulateList(data));
+}
+
 function prepareInt(d) {
   dbName = d.database.dbName;
   version = d.database.version;
 
+  initDb();
+
   //Retriving all latest Visites
-  let visitesDb = new idb(dbName, version);
-  let visitesParam = {
-    operation: "getAll",
-    objstore: "Visites",
-    index: "name",
-    orderBy: "prev",
-  };
-  visitesDb.openDB(visitesParam, initPopulateList);
+  fetchVisitesData();
 
   populatePrintHeaderFooter(d.contents);
 }

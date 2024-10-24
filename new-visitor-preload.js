@@ -11,3 +11,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     );
   },
 });
+
+ipcRenderer.on("visiter_phone", (_event, value) => {
+  document.getElementById("visitorId").value = value;
+});

@@ -15,6 +15,12 @@ async function selectBy(table, whereCluse = {}) {
   return { results: results, objstore: table };
 }
 
+async function selectByCluse(selectCluses = {}) {
+  var results = await jsstoreCon.select(selectCluses);
+
+  return { results: results, objstore: selectCluses.from };
+}
+
 async function insertInToTable(table, values, returnType = "count") {
   let returnValue = {};
   if (!Array.isArray(values)) {
@@ -96,6 +102,12 @@ async function updateTable(table, whereAtt, value, updateType = "update") {
   return returnValue;
 }
 
+async function updateByCluse(updateCluse = {}) {
+  var results = await jsstoreCon.update(updateCluse);
+
+  return { status: "success", results: results, updateCluse: updateCluse };
+}
+
 async function removeFromTable(table, id, customWhereCluse = {}) {
   let obj = { from: table };
 
@@ -116,4 +128,10 @@ async function removeFromTable(table, id, customWhereCluse = {}) {
     message: `${rowsDeleted} record removed successfuly`,
     operation: "remove",
   };
+}
+
+async function removeByCluse(removeCluses = {}) {
+  var results = await jsstoreCon.remove(removeCluses);
+
+  return { results: results, removeCluses: removeCluses };
 }
