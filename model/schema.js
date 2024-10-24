@@ -526,6 +526,14 @@ function visitesSchema() {
       isReturnedLastPass: {
         dataType: "string",
       },
+      passReturnedTime: {
+        dataType: "number",
+        default: 0,
+      },
+      timeConsumed: {
+        dataType: "number",
+        default: 0,
+      },
       totalVisites: {
         dataType: "number",
         default: 0,
