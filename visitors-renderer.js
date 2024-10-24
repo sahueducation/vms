@@ -1,7 +1,3 @@
-let dbName;
-let version;
-let jsstoreCon;
-
 document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.quiteWindow("y");
@@ -338,8 +334,8 @@ function fetchVisitesData() {
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
 
   initDb();
 

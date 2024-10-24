@@ -1,15 +1,15 @@
 async function initDb() {
-  jsstoreCon = new JsStore.Connection();
-  var isDbCreated = await jsstoreCon.initDb(getDbSchema(dbName));
+  G_jsstoreCon = new JsStore.Connection();
+  var isDbCreated = await G_jsstoreCon.initDb(getDbSchema(G_dbName));
   if (isDbCreated) {
     return {
       status: "success",
-      message: `DB ${dbName} is created successfuly.`,
+      message: `DB ${G_dbName} is created successfuly.`,
     };
   } else {
     return {
       status: "success",
-      message: `DB ${dbName} is opened successfuly.`,
+      message: `DB ${G_dbName} is opened successfuly.`,
     };
   }
 }

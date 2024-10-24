@@ -144,7 +144,9 @@
   /**
    * Initiate Datatables
    */
-
+  let G_dbName;
+  let G_version;
+  let G_jsstoreCon;
   /*
   const datatables = select(".datatable", true);
   datatables.forEach((datatable) => {
