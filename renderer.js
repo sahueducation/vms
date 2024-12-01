@@ -1,6 +1,3 @@
-let dbName;
-let version;
-
 document.getElementById("newVisitor").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.setNewVisitor("y");
@@ -69,7 +66,7 @@ function populateCounts(d) {
     keyrange: IDBKeyRange.bound(yesterday, today, true, true),
   };
 
-  let mydb = new idb(dbName, version);
+  let mydb = new idb(G_dbName, G_version);
   mydb.openDB(countYesterdayParam, calculatePercentate);
 }
 
@@ -100,7 +97,7 @@ function count() {
 }
 
 function prepareVisitorChart() {
-  let depdb = new idb(dbName, version);
+  let depdb = new idb(G_dbName, G_version);
   let depParam = {
     operation: "getAll",
     objstore: "Departments",
@@ -117,7 +114,7 @@ function getVisitesByDep(d) {
     newObj[e.depId] = { name: e.name, value: 0 };
   });
 
-  let depdb = new idb(dbName, version);
+  let depdb = new idb(G_dbName, G_version);
   let depParam = {
     operation: "getVisitesByDep",
     objstore: "Visites",
@@ -136,8 +133,8 @@ function visitesByDep(d) {
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
 
   var ct = new Date();
   ct.setDate(ct.getDate() - 1);
@@ -151,10 +148,19 @@ function prepareInt(d) {
     keyrange: IDBKeyRange.lowerBound(today),
   };
 
-  let mydb = new idb(dbName, version);
+  let mydb = new idb(G_dbName, G_version);
   mydb.openDB(countTodayParam, populateCounts);
   prepareVisitorChart();
   populateReportChart();
+
+  //domy data
+  var data = [
+    { name: "IT", value: 20 },
+    { name: "Accounts", value: 12 },
+    { name: "Civil", value: 23 },
+    { name: "Sales", value: 9 },
+  ];
+  populateVisitorChart(data);
 }
 
 function populateVisitorChart(data) {

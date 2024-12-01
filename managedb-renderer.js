@@ -1,262 +1,43 @@
-let dbName;
-let version;
-var jsstoreCon;
-/**********************FOR TESTING PURPOSE********************/
-
-/**********************FOR TESTING PURPOSE********************/
-
 document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.quiteWindow("y");
 });
 
 function importData() {
-  msgHandler({ status: "success", message: "Performing Testing..." });
-
-  jsstoreCon = new JsStore.Connection();
+  msgHandler({ status: "success", message: "Performing DB preparation..." });
 
   const initiatingDb = async () => {
     return initDb();
   };
   initiatingDb().then((data) => msgHandler(data));
 
-  const insertingStates = async () => {
-    return insertStates(states);
+  //Inserting States data ...
+  insertingDataInToTable("States", defaultStates);
+
+  //Inserting Departments data ...
+  insertingDataInToTable("Departments", defaultDepartments);
+
+  //Inserting Categories data ...
+  insertingDataInToTable("VisitorCategory", defaultCategories);
+
+  //Inserting Designation data ...
+  insertingDataInToTable("Designation", defaultDesignation);
+
+  //Inserting Idproofs data ...
+  insertingDataInToTable("IDProof", defaultIdProofs);
+
+  //Inserting Staff data ...
+  insertingDataInToTable("StaffDetails", staffsDumyData);
+
+  //Inserting Operators data ...
+  insertingDataInToTable("Operators", operatorsDumyData);
+}
+
+function insertingDataInToTable(table, value) {
+  const insertingData = async () => {
+    return insertInToTable(table, value);
   };
-  insertingStates().then((data) => msgHandler(data));
-}
-
-async function initDb() {
-  var isDbCreated = await jsstoreCon.initDb(getDbSchema());
-  if (isDbCreated) {
-    return { status: "success", message: "db created" };
-  } else {
-    return { status: "success", message: "db opened" };
-  }
-}
-
-function getDbSchema() {
-  var table = {
-    name: "States",
-    columns: {
-      steteId: {
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      name: {
-        notNull: true,
-        dataType: "string",
-      },
-      createdOn: {
-        notNull: true,
-        dataType: "date_time",
-        default: new Date(),
-      },
-      createdBy: {
-        notNull: true,
-        dataType: "number",
-        default: 1,
-      },
-      updatedOn: {
-        notNull: true,
-        dataType: "date_time",
-        default: new Date(),
-      },
-      updatedBy: {
-        notNull: true,
-        dataType: "number",
-        default: 1,
-      },
-    },
-  };
-
-  var db = {
-    name: dbName,
-    tables: [table],
-  };
-  return db;
-}
-
-async function insertStates(values) {
-  var insertCount = await jsstoreCon.insert({
-    into: "States",
-    values: values,
-  });
-
-  return { status: "success", message: `${insertCount} rows inserted` };
-}
-
-function runScript() {
-  var version = 28;
-  //createStaffDetails();
-  //createDesignation(dbName, version);
-  //createStaffDetails(dbName, version);
-  //deleteDesignation(dbName, version);
-  //deleteStaffDetails(dbName, version);
-  console.log("Started");
-  createIdProof(dbName, version);
-}
-
-function deleteDesignation(d, v) {
-  let param = {
-    operation: "deleteStore",
-    objstore: "Designation",
-  };
-
-  let mydb = new idb(d, v);
-  mydb.openDB(param, msgHandler);
-}
-
-function deleteStaffDetails(d, v) {
-  let param = {
-    operation: "deleteStore",
-    objstore: "StaffDetails",
-  };
-
-  let mydb = new idb(d, v);
-  mydb.openDB(param, msgHandler);
-}
-
-function createStaffDetails(d, v) {
-  const ctime = new Date();
-  const data = [
-    {
-      staffId: 1,
-      designationId: 1,
-      designation: "Director",
-      name: "Mr. Sahu",
-      extension: "111",
-      phonenumber: "1212121212",
-      depId: 1,
-      depName: "IT",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-  ];
-
-  const indexParam = [
-    { indexName: "designationId", unique: false },
-    { indexName: "designation", unique: false },
-    { indexName: "name", unique: false },
-    { indexName: "depId", unique: false },
-    { indexName: "depName", unique: false },
-    { indexName: "phonenumber", unique: false },
-  ];
-
-  const param = {
-    operation: "createStore",
-    objstore: "StaffDetails",
-    keyPath: "staffId",
-    autoIncrement: true,
-    indexed: indexParam,
-    data: data,
-  };
-
-  const mydb = new idb(d, v);
-  mydb.openDB(param, msgHandler);
-
-  return;
-}
-
-function createDesignation(db, version) {
-  const ctime = new Date();
-  const data = [
-    {
-      designationId: 1,
-      name: "Director",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      designationId: 2,
-      name: "Manager",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-  ];
-
-  const indexParam = [
-    { indexName: "designationId", unique: true },
-    { indexName: "name", unique: true },
-  ];
-
-  const param = {
-    operation: "createStore",
-    objstore: "Designation",
-    keyPath: "designationId",
-    autoIncrement: true,
-    indexed: indexParam,
-    data: data,
-  };
-
-  const mydb = new idb(db, version);
-  mydb.openDB(param, msgHandler);
-
-  return;
-}
-
-function createIdProof(db, version) {
-  console.log("In createIdProff function");
-  const ctime = new Date();
-  const data = [
-    {
-      id: 1,
-      name: "Aadhar Card",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      id: 2,
-      name: "Voter Card",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      id: 3,
-      name: "PAN Card",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-    {
-      id: 4,
-      name: "Driving License",
-      creadedDate: ctime,
-      createdBy: 1,
-      updatedDate: ctime,
-      updatedBy: 1,
-    },
-  ];
-
-  const indexParam = [
-    { indexName: "id", unique: true },
-    { indexName: "name", unique: true },
-  ];
-
-  const param = {
-    operation: "createStore",
-    objstore: "IDProof",
-    keyPath: "id",
-    autoIncrement: true,
-    indexed: indexParam,
-    data: data,
-  };
-  console.log(param);
-  const mydb = new idb(db, version);
-  mydb.openDB(param, msgHandler);
-
-  return;
+  insertingData().then((data) => msgHandler(data));
 }
 
 function msgHandler(m) {
@@ -279,8 +60,8 @@ function msgHandler(m) {
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
 }
 
 (function () {

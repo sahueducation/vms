@@ -1,5 +1,3 @@
-let dbName;
-let version;
 let aUsername;
 let aPassword;
 
@@ -40,8 +38,8 @@ function populateRememberMe() {
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
   aUsername = d.credential.user;
   aPassword = d.credential.password;
 

@@ -1,5 +1,3 @@
-let G_dbName;
-let G_version;
 let G_data = [];
 let G_reportType;
 let G_currentPage = 1;
@@ -86,7 +84,7 @@ function displayTable(page, records) {
     el.innerHTML = "";
   } else {
     el.innerHTML =
-      '<tr class="table-danger"><td scope="row" colspan="6">No Data found.</td></tr>';
+      '<tr class="table-danger"><td scope="row" colspan="7">No records found.</td></tr>';
   }
   slicedData.forEach(populateRowForReportTable);
 
@@ -117,7 +115,6 @@ function updatePagination(currentPage) {
 }
 
 function initPopulateList(d) {
-  console.log(d);
   if (Array.isArray(d.results)) {
     G_data = d.results;
     displayTable(G_currentPage, G_data);
@@ -169,18 +166,20 @@ function featchRecords() {
   }
 
   //Retriving all latest Visites
-  let visitesDb = new idb(G_dbName, G_version);
-  let visitesParam = {
-    operation: "getAll",
-    objstore: "Visites",
-    index: "name",
-    orderBy: "prev",
-    extraParam: { from: fromTime, to: toTime, filterKey: filterKey },
+  const extraParam = { from: fromTime, to: toTime, filterKey: filterKey };
+  const fetchData = async () => {
+    return selectByCluse({
+      from: "Visites",
+      order: {
+        by: "visitingTime",
+        type: "desc",
+      },
+    });
   };
-  visitesDb.openDB(visitesParam, filterList);
+  fetchData().then((data) => filterList(data, extraParam));
 }
 
-function filterList(d) {
+function filterList(d, e) {
   G_data = [];
   let compareKey = "";
 
@@ -195,13 +194,10 @@ function filterList(d) {
     }
 
     if (
-      d.results[i].visitingTime > d.param.extraParam.from &&
-      d.results[i].visitingTime < d.param.extraParam.to
+      d.results[i].visitingTime > e.from &&
+      d.results[i].visitingTime < e.to
     ) {
-      if (
-        d.param.extraParam.filterKey == "All" ||
-        d.param.extraParam.filterKey == compareKey
-      ) {
+      if (e.filterKey == "All" || e.filterKey == compareKey) {
         G_data.push(d.results[i]);
       }
     }
@@ -209,7 +205,7 @@ function filterList(d) {
   displayTable(G_currentPage, G_data);
 }
 
-function populateFilterCombo(d) {
+function populateFilterCombo(d, optionText) {
   let displayId = "filterList";
   var sel = document.getElementById(displayId);
   var options = document.querySelectorAll("#" + displayId + " option");
@@ -219,7 +215,8 @@ function populateFilterCombo(d) {
     if (i == 0) {
       var opt = document.createElement("option");
       opt.value = "All";
-      opt.text = "Select " + d.param.reportType;
+      opt.text = optionText;
+
       sel.appendChild(opt);
     }
     var opt = document.createElement("option");
@@ -242,24 +239,40 @@ function populateFilterCombo(d) {
 
 function configureReportByType(type) {
   let title = "Report";
-  let db = new idb(G_dbName, G_version);
-  let param = {
-    operation: "getAll",
-    index: "name",
-  };
+  let Selectcluse = {};
+  let selectFieldInitialOption = "";
 
   if (type == "dep") {
     title = title + " : Department Wise";
-    param.objstore = "Departments";
-    param.reportType = "Department";
+    Selectcluse.from = "Departments";
+    selectFieldInitialOption = "Select Department";
   } else if (type == "stf") {
     title = title + " : Staff Wise";
-    param.objstore = "StaffDetails";
-    param.reportType = "Staff Name";
+    Selectcluse.from = "StaffDetails";
+    selectFieldInitialOption = "Select Staff Name";
   }
 
   $("#report-title").html(title);
-  db.openDB(param, populateFilterCombo);
+
+  const fetchData = async () => {
+    return selectByCluse(Selectcluse);
+  };
+  fetchData().then((data) =>
+    populateFilterCombo(data, selectFieldInitialOption)
+  );
+}
+
+function fetchLatestVisites() {
+  const fetchData = async () => {
+    return selectByCluse({
+      from: "Visites",
+      order: {
+        by: "visitingTime",
+        type: "desc",
+      },
+    });
+  };
+  fetchData().then((data) => initPopulateList(data));
 }
 
 function prepareInt(d) {
@@ -268,18 +281,13 @@ function prepareInt(d) {
 
   G_reportType = document.getElementById("report-type").value;
 
+  initDb();
+
   //Configure report by type
   configureReportByType(G_reportType);
 
   //Retriving all latest Visites
-  let visitesDb = new idb(G_dbName, G_version);
-  let visitesParam = {
-    operation: "getAll",
-    objstore: "Visites",
-    index: "name",
-    orderBy: "prev",
-  };
-  visitesDb.openDB(visitesParam, initPopulateList);
+  fetchLatestVisites();
 }
 
 (function () {

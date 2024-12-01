@@ -1,6 +1,3 @@
-let dbName;
-let version;
-
 document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.quiteWindow("y");
@@ -12,28 +9,25 @@ function addOperator() {
   }
   const ctime = new Date().getTime();
 
-  const data = {
-    userName: document.getElementById("username").value,
-    userPassword: document.getElementById("password").value,
-    otherDetails: document.getElementById("other-details").value,
-    userRole: "operator",
-    passwordUpdatedOn: ctime,
-    isLogedIn: "n",
-    createdDate: ctime,
-    createdBy: 1,
-    updatedDate: ctime,
-    updatedBy: 1,
-  };
+  const data = [
+    {
+      userName: document.getElementById("username").value,
+      userPassword: document.getElementById("password").value,
+      otherDetails: document.getElementById("other-details").value,
+      userRole: "operator",
+      passwordUpdatedOn: ctime,
+      isLogedIn: "n",
+      createdOn: ctime,
+      createdBy: 1,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
-  const param = {
-    operation: "add",
-    objstore: "Users",
-    index: "userName",
-    data: data,
+  const fetchData = async () => {
+    return insertInToTable("Operators", data, "results");
   };
-
-  const mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  fetchData().then((data) => messageHandler(data));
 
   return false;
 }
@@ -53,14 +47,10 @@ function matchPassword() {
 
 function deletUser(d) {
   if (confirm("Are you sure, want to delete this record?")) {
-    let param = {
-      operation: "delete",
-      objstore: "Users",
-      index: "userName",
-      key: Number(d),
+    const removeData = async () => {
+      return removeFromTable("Operators", Number(d));
     };
-    let mydb = new idb(dbName, version);
-    mydb.openDB(param, messageHandler);
+    removeData().then((data) => messageHandler(data));
   }
 }
 
@@ -68,14 +58,13 @@ function messageHandler(m) {
   if (m.status == "success") {
     if (m.operation == "add") {
       document.getElementById("newOperatorForm").reset();
-      m.param.data.userId = m.param.key;
-      populateOperatorDetailsTable(m.param.data);
-    } else if (m.operation == "delete") {
-      const element = document.getElementById("row-" + m.param.key);
+      populateOperatorDetailsTable(m.results);
+    } else if (m.operation == "remove") {
+      const element = document.getElementById("row-" + m.id);
       element.remove();
     } else if (m.operation == "edit") {
       document.getElementById("btnCloseEditModal").click();
-      populateOperatorDetailsTable(m.param.data);
+      populateOperatorDetailsTable(m.results);
     }
   }
   alert(m.message);
@@ -92,35 +81,27 @@ function updateOperator() {
     return false;
   }
 
-  const data = {
-    userName: document.getElementById("updateUsername").value,
-    userPassword: pass,
-    otherDetails: document.getElementById("updateOtherDetails").value,
-    passwordUpdatedOn: ctime,
-    updatedDate: ctime,
-    updatedBy: 1,
+  const data = [
+    {
+      userName: document.getElementById("updateUsername").value,
+      userPassword: pass,
+      otherDetails: document.getElementById("updateOtherDetails").value,
+      passwordUpdatedOn: ctime,
+      updatedOn: ctime,
+      updatedBy: 1,
+      id: Number(key),
+    },
+  ];
+
+  const updateData = async () => {
+    return updateTable("Operators", Number(key), data, "results");
   };
-
-  const param = {
-    operation: "edit",
-    objstore: "Users",
-    index: "userName",
-    data: data,
-    key: Number(key),
-  };
-
-  const mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
-
+  updateData().then((data) => messageHandler(data));
   return false;
 }
 
-function initUpdate() {
-  document.getElementById("updateButton").click();
-}
-
 function populateModal(d) {
-  const userId = d.dataset.userid;
+  const userId = d.dataset.id;
   const rowElement = document.getElementById("row-" + userId);
   const rowItems = rowElement.getElementsByTagName("td");
 
@@ -136,14 +117,13 @@ function populateModal(d) {
 }
 
 function populateOperatorDetailsTable(d) {
-  //return false;
   let table = document.getElementById("operatorDetailsTable");
-  let row = document.getElementById("row-" + d.userId);
+  let row = document.getElementById("row-" + d.id);
   if (row) {
     row.innerHTML = "";
   } else {
     row = document.createElement("tr");
-    row.setAttribute("id", "row-" + d.userId);
+    row.setAttribute("id", "row-" + d.id);
     const el = table.getElementsByTagName("tbody")[0];
     el.appendChild(row);
   }
@@ -162,14 +142,14 @@ function populateOperatorDetailsTable(d) {
 
   let html = '<i class="bi bi-pencil-square" ';
   html = html + 'data-bs-toggle="modal" data-bs-target="#ExtralargeModal" ';
-  html = html + 'data-userId="' + d.userId + '" ';
+  html = html + 'data-id="' + d.id + '" ';
   html =
     html +
     'onClick="populateModal(this);" style="cursor: pointer; margin-right:3px;"></i>';
   html =
     html +
     '<i class="bi bi-trash" onclick="deletUser(' +
-    d.userId +
+    d.id +
     ');" style="cursor: pointer; margin-left:3px;"></i>';
   node = document.createElement("td");
   node.innerHTML = html;
@@ -184,17 +164,15 @@ function initOperatorTable(d) {
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
 
+  initDb();
   //Retriving all Staff Details
-  let staffdb = new idb(dbName, version);
-  let staffddbParam = {
-    operation: "getAll",
-    objstore: "Users",
-    index: "userName",
+  const fetchData = async () => {
+    return selectAll("Operators");
   };
-  staffdb.openDB(staffddbParam, initOperatorTable);
+  fetchData().then((data) => initOperatorTable(data));
 }
 
 (function () {

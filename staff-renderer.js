@@ -1,6 +1,3 @@
-let dbName;
-let version;
-
 document.getElementById("btnCancel").addEventListener("click", (e) => {
   e.preventDefault();
   window.electronAPI.quiteWindow("y");
@@ -12,48 +9,41 @@ function addStaff() {
 
   const ctime = new Date().getTime();
 
-  const data = {
-    designationId: designationSelectElement.value,
-    designation:
-      designationSelectElement.options[designationSelectElement.selectedIndex]
-        .text,
-    name: document.getElementById("name").value,
-    extension: document.getElementById("extension").value,
-    phonenumber: document.getElementById("phone-number").value,
-    depId: departmentsSelectElement.value,
-    depName:
-      departmentsSelectElement.options[departmentsSelectElement.selectedIndex]
-        .text,
-    otherDetails: document.getElementById("other-details").value,
-    createdDate: ctime,
-    createdBy: 1,
-    updatedDate: ctime,
-    updatedBy: 1,
-  };
+  const data = [
+    {
+      designationId: Number(designationSelectElement.value),
+      designation:
+        designationSelectElement.options[designationSelectElement.selectedIndex]
+          .text,
+      name: document.getElementById("name").value,
+      extension: document.getElementById("extension").value,
+      phonenumber: document.getElementById("phone-number").value,
+      depId: Number(departmentsSelectElement.value),
+      depName:
+        departmentsSelectElement.options[departmentsSelectElement.selectedIndex]
+          .text,
+      otherDetails: document.getElementById("other-details").value,
+      createdOn: ctime,
+      createdBy: 1,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
-  const param = {
-    operation: "add",
-    objstore: "StaffDetails",
-    index: "name",
-    data: data,
+  const insertingData = async () => {
+    return insertInToTable("StaffDetails", data, "results");
   };
-
-  const mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  insertingData().then((data) => messageHandler(data));
 
   return false;
 }
 
 function deletStaff(d) {
   if (confirm("Are you sure, want to delete this record?")) {
-    let param = {
-      operation: "delete",
-      objstore: "StaffDetails",
-      index: "name",
-      key: Number(d),
+    const removeData = async () => {
+      return removeFromTable("StaffDetails", Number(d), { staffId: Number(d) });
     };
-    let mydb = new idb(dbName, version);
-    mydb.openDB(param, messageHandler);
+    removeData().then((data) => messageHandler(data));
   }
 }
 
@@ -61,21 +51,20 @@ function messageHandler(m) {
   if (m.status == "success") {
     if (m.operation == "add") {
       document.getElementById("newStaffForm").reset();
-      m.param.data.staffId = m.param.key;
-      populateStaffDetailsTable(m.param.data);
-    } else if (m.operation == "delete") {
-      const element = document.getElementById("row-" + m.param.key);
+      populateStaffDetailsTable(m.results);
+    } else if (m.operation == "remove") {
+      const element = document.getElementById("row-" + m.id);
       element.remove();
     } else if (m.operation == "edit") {
       document.getElementById("btnCloseEditModal").click();
-      populateStaffDetailsTable(m.param.data);
+      populateStaffDetailsTable(m.results);
     }
   }
   alert(m.message);
 }
 
 function populateFild(d) {
-  let placeholderId = d.param.objstore;
+  let placeholderId = d.objstore;
   var selectElement = document.getElementById(placeholderId);
   var options = document.querySelectorAll("#" + placeholderId + " option");
   options.forEach((o) => o.remove());
@@ -108,35 +97,28 @@ function updateStaff() {
   const OtherDetails = document.getElementById("updateOtherDetails").value;
   const key = document.getElementById("updateStaffId").value;
 
-  const data = {
-    designationId: DesignationId,
-    designation: Designation,
-    name: name,
-    extension: Extension,
-    phonenumber: PhoneNumber,
-    depId: DepartmentsId,
-    depName: Departments,
-    otherDetails: OtherDetails,
-    updatedDate: ctime,
-    updatedBy: 1,
-  };
+  const data = [
+    {
+      staffId: Number(key),
+      designationId: Number(DesignationId),
+      designation: Designation,
+      name: name,
+      extension: Extension,
+      phonenumber: PhoneNumber,
+      depId: Number(DepartmentsId),
+      depName: Departments,
+      otherDetails: OtherDetails,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
-  const param = {
-    operation: "edit",
-    objstore: "StaffDetails",
-    index: "name",
-    data: data,
-    key: Number(key),
+  const updateData = async () => {
+    return updateTable("StaffDetails", 0, data, "results");
   };
-
-  const mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  updateData().then((data) => messageHandler(data));
 
   return false;
-}
-
-function initUpdate() {
-  document.getElementById("updateButton").click();
 }
 
 function populateModal(d) {
@@ -164,6 +146,7 @@ function populateModal(d) {
   document.getElementById("updateExtension").value = extension;
   document.getElementById("updateOtherDetails").value = otherDetails;
 }
+
 function populateStaffDetailsTable(d) {
   let table = document.getElementById("staffDetailsTable");
   let row = document.getElementById("row-" + d.staffId);
@@ -225,36 +208,30 @@ function initStaffTable(d) {
   }
 }
 
+function fetchMasterData(table) {
+  const fetchData = async () => {
+    return selectAll(table);
+  };
+  fetchData().then((data) => populateFild(data));
+}
+
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
+
+  initDb();
 
   //Retriving all Department Names
-  let depdb = new idb(dbName, version);
-  let depParam = {
-    operation: "getAll",
-    objstore: "Departments",
-    index: "name",
-  };
-  depdb.openDB(depParam, populateFild);
+  fetchMasterData("Departments");
 
   //Retriving all Designations
-  let desigdb = new idb(dbName, version);
-  let desigdbParam = {
-    operation: "getAll",
-    objstore: "Designation",
-    index: "name",
-  };
-  desigdb.openDB(desigdbParam, populateFild);
+  fetchMasterData("Designation");
 
   //Retriving all Staff Details
-  let staffdb = new idb(dbName, version);
-  let staffddbParam = {
-    operation: "getAll",
-    objstore: "StaffDetails",
-    index: "name",
+  const fetchData = async () => {
+    return selectAll("StaffDetails");
   };
-  staffdb.openDB(staffddbParam, initStaffTable);
+  fetchData().then((data) => initStaffTable(data));
 }
 
 (function () {

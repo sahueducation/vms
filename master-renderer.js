@@ -1,5 +1,3 @@
-let dbName;
-let version;
 let footerContain;
 let headerContain;
 
@@ -9,7 +7,7 @@ document.getElementById("btnCancel").addEventListener("click", (e) => {
 });
 
 function populateFild(d) {
-  let displayId = d.param.objstore + "List";
+  let displayId = d.objstore + "List";
   var sel = document.getElementById(displayId);
   var options = document.querySelectorAll("#" + displayId + " option");
   options.forEach((o) => o.remove());
@@ -39,37 +37,31 @@ function formSubmit(o) {
   let objstoreName = o[0].id;
   let ctime = new Date().getTime();
 
-  let data = {
-    name: catName,
-    createdDate: ctime,
-    createdBy: 1,
-    updatedDate: ctime,
-    updatedBy: 1,
-  };
-  let param = {
-    operation: "add",
-    objstore: objstoreName,
-    index: "name",
-    data: data,
-  };
+  let data = [
+    {
+      name: catName,
+      createdOn: ctime,
+      createdBy: 1,
+      updatedOn: ctime,
+      updatedBy: 1,
+    },
+  ];
 
-  let mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  //Inserting data ...
+  const insertingData = async () => {
+    return insertInToTable(objstoreName, data);
+  };
+  insertingData().then((data) => messageHandler(data));
 
   return false;
 }
 
 function messageHandler(m) {
   if (m.status == "success") {
-    let storeName = m.param.objstore;
+    let storeName = m.objstore;
     document.getElementById(storeName).value = "";
-    let param = {
-      operation: "getAll",
-      objstore: storeName,
-      index: "name",
-    };
-    let mydb = new idb(dbName, version);
-    mydb.openDB(param, populateFild);
+
+    fetchMasterData(storeName);
     alert(m.message);
     if (m.operation == "edit")
       document.getElementById("btnClose" + storeName).click();
@@ -114,76 +106,48 @@ function updateRecord(o) {
   var value = document.getElementById("edit" + storeName).value;
   var key = document.getElementById("edit" + storeName).dataset.keyvalue;
 
-  let param = {
-    operation: "edit",
-    objstore: storeName,
-    index: "name",
-    key: Number(key),
-    value: value,
+  const updateData = async () => {
+    return updateTable(storeName, Number(key), value);
   };
-
-  let mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  updateData().then((data) => messageHandler(data));
 }
 
 function deleteRecord(o) {
   let storeName = o.id.replace("btnDelete", "");
   var key = document.getElementById(storeName + "List").value;
 
-  let param = {
-    operation: "delete",
-    objstore: storeName,
-    index: "name",
-    key: Number(key),
+  const removeData = async () => {
+    return removeFromTable(storeName, Number(key));
   };
-  let mydb = new idb(dbName, version);
-  mydb.openDB(param, messageHandler);
+  removeData().then((data) => messageHandler(data));
+}
+
+function fetchMasterData(table) {
+  const fetchData = async () => {
+    return selectAll(table);
+  };
+  fetchData().then((data) => populateFild(data));
 }
 
 function prepareInt(d) {
-  dbName = d.database.dbName;
-  version = d.database.version;
+  G_dbName = d.database.dbName;
+  G_version = d.database.version;
 
+  initDb();
   //Retriving all States Names
-  let mydb = new idb(dbName, version);
-  let param = { operation: "getAll", objstore: "States", index: "name" };
-  mydb.openDB(param, populateFild);
+  fetchMasterData("States");
 
   //Retriving all Department Names
-  let depdb = new idb(dbName, version);
-  let depParam = {
-    operation: "getAll",
-    objstore: "Departments",
-    index: "name",
-  };
-  depdb.openDB(depParam, populateFild);
+  fetchMasterData("Departments");
 
   //Retriving all User Category
-  let catdb = new idb(dbName, version);
-  let catParam = {
-    operation: "getAll",
-    objstore: "VisitorCategory",
-    index: "name",
-  };
-  catdb.openDB(catParam, populateFild);
+  fetchMasterData("VisitorCategory");
 
   //Retriving all Designations
-  let desigdb = new idb(dbName, version);
-  let desigdbParam = {
-    operation: "getAll",
-    objstore: "Designation",
-    index: "name",
-  };
-  desigdb.openDB(desigdbParam, populateFild);
+  fetchMasterData("Designation");
 
-  //Retriving all Designations
-  let idproofdb = new idb(dbName, version);
-  let idproofParam = {
-    operation: "getAll",
-    objstore: "IDProof",
-    index: "name",
-  };
-  idproofdb.openDB(idproofParam, populateFild);
+  //Retriving all IdProof
+  fetchMasterData("IDProof");
 
   //Populate Header Contents
   populateContent(d);
